@@ -1,0 +1,7 @@
+<h2>Make a Payment</h2>
+<p><%= requestorEmail %> has requested <%= amount %>.</p>
+<form method="POST">
+  <label for="amount">Amount</label>
+  <input type="text" name="amount" value="<%= amount %>" />
+  <button>Pay <%= requestorEmail %></button>
+</form>

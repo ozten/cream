@@ -1,0 +1,17 @@
+  /**
+   * @param amount - Integer which is an amount of money in cents
+   * @param accepted_types - List of Payment Type codes which you accept
+   * @param success - Callback functin which will be called in a sucessful payment
+   * @param failure - Callback functin which will be called upon failure
+   * 
+   * Amount Examples: 1000 - $10.00, 612400 - $6,124.00
+   * 
+   * Accepted types Examples: ['VISA', 'MASTERCARD', 'IOU', 'BITCOIN']
+   * All possible values for accepted_types:
+   * AMERICANEXPRESS, BITCOIN, DINERSCLUBCARD, IOWEYOU, MASTERCARD, VISA
+   * 
+   * Success Callback - function (reciept) { ... }
+   * 
+   * Failure Callback - funciton (error) { ... }
+   * 
+   */

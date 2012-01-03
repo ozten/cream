@@ -1,0 +1,15 @@
+<h1>Create Your Profile</h1>
+
+<form method="POST">
+  <div>
+    <label>Email:</label> <%= user %>
+  </div>
+  <div>
+    <label for="fullName">Full Name</label>
+    <input type="text" id="fullName" name="fullName"
+           value="<% if (fullName) { %><%= fullName %><% } %>" />
+  </div>
+  <div>
+    <button>Create Profile</button>
+  </div>
+</form>

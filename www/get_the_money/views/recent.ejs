@@ -1,0 +1,5 @@
+<h1>Your Recent Activity</h2>
+<% for (var i=0; i < payments.length; i++) { %>
+  <a href="mailto:<%= payments[i]['email'] %>"><%= payments[i]['fullName'] %></a>
+<% } %>
+Balance: 

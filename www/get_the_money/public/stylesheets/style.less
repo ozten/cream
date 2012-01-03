@@ -1,0 +1,21 @@
+@width: 60px;
+@color: #0BF;
+
+body {
+  padding: @width;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: @color;
+}
+
+div.foo {
+  div.bar {
+    p.baz { width: @width; }
+    p.buzz { width: @width; }
+  }
+}
+
+// Layout
+footer { margin-top: 100px; }

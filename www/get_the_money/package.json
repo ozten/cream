@@ -1,0 +1,15 @@
+{
+    "name": "cream-gtm"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+      "ejs": "0.6.1"
+    , "express": "2.5.2"
+    , "less": ">= 0.0.1"
+    , "ejs": ">= 0.0.1"
+    , "connect-redis"
+    , "mail"
+    , "node-uuid"
+    , "redis"
+  }
+}

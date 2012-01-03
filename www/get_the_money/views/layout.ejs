@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <header><h1><%= title %></h1>
+      <nav>
+        <ul>
+          <% if (authenticated) { %>
+            <li><a href="/ask-for-cash">Ask for Cash</a></li>
+            <li><a href="/recent">Recent Activity</a></li>
+            <li><a href="/reciepts">Reciepts</a></li>
+            <li><img src="<%= gravatar %>" /><%= user %> </li>
+            <li><a href="/logout">Log out</a></li>
+          <% } else { %>
+            <li><a href="/about">About</a></li>
+            <li><button class="bid">Sign In</button></li>
+          <% } %>
+        </ul>
+      </nav>
+    </header>
+    <%- body %>
+    <footer>Dollar, dollar bill y'll</footer>
+    <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script -->
+    <script src="/javascripts/lib/jquery-1.7.1.min.js"></script>
+    <script src="https://browserid.org/include.js"></script>
+    <script src="/javascripts/browserid.js"></script>
+
+    <!-- // TODO include.js should bring winchan, etc -->
+    <script src="http://localhost:3001/javascripts/lib/winchan.js"></script>
+    <script src="http://localhost:3001/javascripts/include.js"></script>
+<script>
+$(document).ready(function () {
+
+  console.info('hey');
+  console.info(WinChan);
+
+$('#winning').click(function (event) {
+  event.preventDefault();
+
+  navigator.payz('66600', ['VISA'], 
+                function (reciept) { console.info(reciept); }, 
+                function (error) { console.error(error); });
+  });
+});
+</script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+body {
+  padding: 60px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00bbff;
+}
+div.foo div.bar p.baz {
+  width: 60px;
+}
+div.foo div.bar p.buzz {
+  width: 60px;
+}
+footer {
+  margin-top: 100px;
+}
