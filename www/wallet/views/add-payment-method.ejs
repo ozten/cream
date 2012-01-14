@@ -1,0 +1,77 @@
+<h1>Add a Payment Method</h1>
+<div id='existing-payment'>
+  <h2>Existing</h2>
+  <ol id="existing-payment-methods">
+    <% for (var i=0; i < existing_methods.length; i++) {
+         var method = existing_methods[i]; 
+         if (method.type == 'VISA') { %>
+           <li><%= method.type %> <%= method.display %> expires <%= method.expires %></li>
+      <% } else if (method.type == 'IOU') { %>
+           <li><%= method.type %></li>
+      <% } %>           
+    <% } %>
+  </ol>
+</div>
+<div id='add-payment'>
+  <h2>Choose a Payment Method</h2>
+  <div id="chooser">
+    <ul>
+      <% /* For now the demo is really only the VISA tab, other tabs are for color */ %>
+      <li><a href="VISA">VISA</a></li>
+      <li><a href="MC">MasterCard</a></li>
+      <li><a href="AMEX">American Express</a></li>
+      <li><a href="BIT">BitCoin</a></li>
+      <li><a href="IOU">I Owe You</a></li>
+      <li><a href="PYSWRM">PaySwarm</a></li>
+    </ul>    
+  </div><!-- #chooser -->
+  <div id="chooser2" class="wizard2">
+    <div id="chooser-VISA">
+      <div class="payment-errors"></div>
+      <h3>VISA Credit Card</h3>
+      <!-- Stripe -->
+      <form id="stripe-payment" action="/stripe-add-payment" method="POST">
+      <input type="hidden" name="payment-type" value="VISA" />
+      <div><label for="visa-cc">Card Number</label><input id="visa-cc" name="visa-cc" value="" /></div>
+      <div><label for="visa-expiration-month">Expiration Date</label><input id="visa-expiration-month" name="visa-expiration-month" value="" size="2" /> / <input id="visa-expiration-year" name="visa-expiration-year" value="" size="4" /></div>
+      <div><label for="visa-cvv2">CVV</label><input id="visa-cvv2" name="visa-cvv2" value="" size="3" /></div>
+      </form>
+    </div>
+    <div id="chooser-MC">
+      <h3>Master Card Credit</h3>
+      <div><label for="mc-cc">Card Number</label><input id="mc-cc" name="mc-cc" value="" /></div>
+      <div><label for="mc-expiration">Expiration Date</label><input id="mc-expiration" name="mc-expiration" value="" /></div>
+      <div><label for="mc-ccv">CCV</label><input id="mc-ccv" name="mc-ccv" value="" /></div>
+    </div>
+    <div id="chooser-AMEX">
+      <h3>American Express Charge Card</h3>
+      <div><label for="amex-cc">Card Number</label><input id="amex-cc" name="amex-cc" value="" /></div>
+      <div><label for="amex-expiration">Expiration Date</label><input id="amex-expiration" name="amex-expiration" value="" /></div>
+    </div>
+    <div id="chooser-BIT">
+      <h3>BitCoin Account Direct Payment</h3>
+      <div><label for="amex-cc">BitCoin Purse</label><input id="bitcoin-purse" name="bitcoin-purse" value="" /></div>
+    </div>
+    <div id="chooser-IOU">
+      <h3>I Owe You</h3>
+      <p>I alice@example.com promise to pay ASAP.</p>
+      <p>I am cool with getting reminder emails, until the debt is paid off.</p>
+    </div>
+    <div id="chooser-PYSWRM">
+      <h3>PaySwarm</h3>
+      <p>Some swarm thing here ...</p>
+    </div>
+    <div id="chooser-nav">
+      <button class="cancel">Cancel</button><button class="continue">Add Payment Details</button>
+    </div>
+  </div><!-- chooser2 -->
+  
+</div>
+
+<script>
+/* Un-comment to Automate for develping second step of wizard
+window.addEventListener('load', function () {
+  $('[href=VISA]').click();
+});
+*/
+</script>
