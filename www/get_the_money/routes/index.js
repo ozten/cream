@@ -62,22 +62,26 @@ exports.ask_for_cash = function(req, res){
   resp = browserid.enforceLogIn(req, res);
   if (resp) return resp;
   profiles.getProfile(req.user, req, res, function (exists, profile) {
-    util.debug('getProfile callback %s %s', exists, profile);
+    util.debug(util.format('getProfile callback %s %s', exists, profile));
     util.debug(exists);
     util.debug(util.inspect(profile));    
     if (exists) {
       if (req.method === 'POST') {
         var email = req.body.email,
             senders_email = req.user,
-            amount = req.body.amount;
-            
+            amount = parseInt(req.body.dollaramount, 10) * 100 + parseInt(req.body.centamount, 10);
+        console.log('POST body', req.body);
+        console.log('POST ask_for_cash', amount);
         payments.paymentRequested(senders_email, email, 
                                   amount, function (err, payReq) {
+        console.log('paymentRequested callback');
           if (err) throw err;
+        console.log('format message');
           var message_body = util.format('%s has asked you for %s.\n' +
                 'You can pay them by visiting:\n' + 
-                'http://localhost:3000/pay/%s/%s\n', profile['fullName'], amount,
+                'http://10.0.1.13:3000/pay/%s/%s\n', profile['fullName'], amount,
                                          qs.escape(email), qs.escape(payReq.id));
+          console.log(message_body);
           mail.message({
             from: senders_email,
             to: [email],
@@ -85,10 +89,13 @@ exports.ask_for_cash = function(req, res){
             subject: util.format('%s has asked you for some cream', profile['fullName'])
           })
           .body(message_body)
+
           .send(function(err) {
-           if (err) throw err;
+           //if (err) throw err;
+            console.log(err);
             console.log(message_body);
           });
+
           res.redirect('/ask-for-cash');
         }); // payments.paymentRequested
 
@@ -97,21 +104,40 @@ exports.ask_for_cash = function(req, res){
         res.render('ask_for_cash', {email: 'hobo', _:function (msgid) { return msgid.toUpperCase(); }});
       }
     } else {
+      console.info("No profile data, please register");
       res.redirect('/register');
     }
   });
 };
 
 exports.pay = function(req, res){
-  console.info(req.params.email);
-  var email = req.params.email,
-      pay_req_id = req.params.pay_req_id;
+  console.info(req.params.email); 
+  // Three possibilities
+  // 1) no auth - capture details to session and redirect
+  // 2) fresh auth - check session and continue
+  // 3) auth - use request params and continue
+  if (! req.user) {
+      console.log("copying", req.params);
+      var pay_info = { email: req.params.email,
+                       pay_req_id: req.params.pay_req_id};
+      req.session.pay_info = pay_info;
+      req.session.foo = 'hello world';
+      console.log(req.session);
+      res.render('pay_login');
+
+      return;
+  } else if (req.session.pay_info){   
+    var email      = req.session.pay_info.email,
+        pay_req_id = req.session.pay_info.pay_req_id;
+    console.log('back', req.session);
+  } else {
+    var email = req.params.email,
+        pay_req_id = req.params.pay_req_id;
+        console.log('no payinfo back', req.session);
+  }
   console.log('email=%s id=%s', email, pay_req_id);
   payments.paymentRequest(pay_req_id, function (err, pay_req) {
     console.log(pay_req);
-    if (req.method === 'POST') {
-      console.info(req.body.email);
-    }
     //requesteeEmail: requesteeEmail,
     res.render('pay', { requestorEmail: pay_req['requestorEmail'], amount: pay_req.amount });
   });
@@ -120,9 +146,10 @@ exports.pay = function(req, res){
 // Middleware
 exports.localVars = function (req, res, next) {
   var vars = {
-    title: 'C.R.E.A.M., Get the Money',
+    title: 'C.R.E.A.M, Get the Money',
     authenticated: false
   };
+  console.log("localVars is running");
   if (req.user) {
     vars.authenticated = true;
     vars.gravatar = 'http://www.gravatar.com/avatar/' +
@@ -131,5 +158,7 @@ exports.localVars = function (req, res, next) {
   for (var k in vars) {
     res.local(k, vars[k]);
   }
+  console.log("next ma man");
+  res.local('page_scripts', []);
   next();
 };

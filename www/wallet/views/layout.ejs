@@ -5,14 +5,17 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <header><h1><%= title %></h1>
+    <header>
+      <h1><%= title %></h1>
       <nav>
         <ul>
           <li>About</li>
         </ul>
       </nav>
     </header>
-    <%- body %>
+    <div id="content">
+      <%- body %>
+    </div>
     <footer></footer>
     <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script -->
     <script src="/javascripts/lib/jquery-1.7.1.min.js"></script>
@@ -22,5 +25,9 @@
     <!-- // TODO include.js should bring winchan, etc -->
     <script src="/javascripts/lib/winchan.js"></script>
     <script src="/javascripts/wallet.js"></script>
+    <script src="https://js.stripe.com/v1/"></script>
+    <script>
+Stripe.setPublishableKey('pk_iWEPqAvbN0ikmxmfJ99A3uohzegYO');
+    </script>
   </body>
 </html>

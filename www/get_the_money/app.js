@@ -26,7 +26,7 @@ app.configure(function(){
                             store: new RedisStore }));
 
   app.use(browserid.authUser({ secret: "yabba dabba do",
-                               audience: 'http://localhost:3000' }));
+                               audience: 'http://10.0.1.13:3000' }));
   app.use(routes.localVars);
   app.use(app.router);
 

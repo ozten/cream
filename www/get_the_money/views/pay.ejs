@@ -1,7 +1,20 @@
 <h2>Make a Payment</h2>
 <p><%= requestorEmail %> has requested <%= amount %>.</p>
-<form method="POST">
-  <label for="amount">Amount</label>
-  <input type="text" name="amount" value="<%= amount %>" />
+<form id="make-payment" method="POST">
+  <div>
+    <label for="amount">Amount</label>
+    <input type="number" id="amount" name="amount" value="<%= amount %>" />
+  </div>
+  <div>
+    <label for="requestorEmail">Pay to</label>
+    <input type="text" name="requestorEmail" value="<%= requestorEmail %>" />
+  </div>
   <button>Pay <%= requestorEmail %></button>
 </form>
+<div id="" class="hidden">
+  <h3>Thanks!</h3>
+  <p>Thanks for making your payment.</p>
+</div>
+<%
+page_scripts = ['/javascripts/pay.js'];
+%>

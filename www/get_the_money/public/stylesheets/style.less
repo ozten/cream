@@ -1,6 +1,41 @@
 @width: 60px;
 @color: #0BF;
 
+header {
+  ul {
+    padding-left: 0px;
+
+    li {
+      float: left;
+      list-style: none;
+
+      a {
+        border: solid 1px #DDD;
+        padding: 20px;
+        margin: auto 5px;
+      }
+    }
+    #user-nav {
+      padding: 0px;
+      margin: 0px;
+
+      img {
+        width: 50px;
+        height: 50px;
+        margin-top: -15px;
+      }
+    }
+  }
+}
+
+#content {
+  clear: both;
+
+  .home-blurb {
+    min-height: 400px;
+    padding-top: 200px;
+  }
+}
 body {
   padding: @width;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -15,6 +50,10 @@ div.foo {
     p.baz { width: @width; }
     p.buzz { width: @width; }
   }
+}
+
+.hidden {
+  display: none;
 }
 
 // Layout

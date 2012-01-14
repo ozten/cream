@@ -28,9 +28,10 @@ exports.paymentRequested = function (requestorEmail, requesteeEmail, amount, cb)
         id: uuid.v1(),
         requestorEmail: requestorEmail,
         requesteeEmail: requesteeEmail,
-        amount: amount
+        amount: String(amount)
       },
       key = util.format('pay_req-%s', paymentRequest.id);
+  console.log('xpaymentRequested', paymentRequest);
   // TODO maintain whatever indexes based on email, etc
   client.hmset(key, paymentRequest, function (err, resp) {
     redis.print(err, resp);
@@ -43,6 +44,7 @@ exports.paymentRequest = function (id, cb) {
   var key = util.format('pay_req-%s', id);
   client.hgetall(key, function (err, pay_req) {
     redis.print(err, pay_req);
+    console.log('pay_req', pay_req);
     cb(err, pay_req);
   });
 };

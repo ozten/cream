@@ -1,15 +1,12 @@
 <h2>Request Cash</h2>
 <form method="POST">
-  Hobos <%= _(email) %>
-  <%= gettext('hambone', 'Hambone') %>
-  <%= _('hambone burer', 'Hambone Burger') %>
   <div>
     <label for='email'>Ask</label>
     <input type="email" id="email" name="email" value="" /> 
   </div>
   <div>
-    <label for="amount">for</label>
-    <input type="number" id="amount" name="amount" value="" />
+    <label for="dollaramount">for</label>
+    $ <input type="number" id="dollaramount" name="dollaramount" value="" size="3" />.<input type="number" id="centamount" name="centamount" value="00" size="2" />
   </div>
   <div>
     <button>Email Now</button>

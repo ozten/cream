@@ -1,3 +1,31 @@
+header ul {
+  padding-left: 0px;
+}
+header ul li {
+  float: left;
+  list-style: none;
+}
+header ul li a {
+  border: solid 1px #DDD;
+  padding: 20px;
+  margin: auto 5px;
+}
+header ul #user-nav {
+  padding: 0px;
+  margin: 0px;
+}
+header ul #user-nav img {
+  width: 50px;
+  height: 50px;
+  margin-top: -15px;
+}
+#content {
+  clear: both;
+}
+#content .home-blurb {
+  min-height: 400px;
+  padding-top: 200px;
+}
 body {
   padding: 60px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -10,6 +38,9 @@ div.foo div.bar p.baz {
 }
 div.foo div.bar p.buzz {
   width: 60px;
+}
+.hidden {
+  display: none;
 }
 footer {
   margin-top: 100px;

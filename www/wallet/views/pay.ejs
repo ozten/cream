@@ -1,7 +1,20 @@
-<h1>Wallet</h1>
-<p>Amount: <b>$666.00</b></p>
-<p>Salties accepts:
-  <li><input type="radio" name="payment1" value="VISA" /> VISA</li>
-  <li>I Owe You</li>
+<h1>Pay</h1>
+<p>Amount: <b id="amount"></b></p>
+<p>Reason: <span id="reason"></span></p>
+<p><strong id="reciever"></strong> accepts:
+  <ol id="payment-choices">
+    <!-- TODO base on accepted type -->
+    <li><input type="radio" id="payment1" name="payment" value="VISA1" /> <label for="payment1">VISA</label></li>
+    <li><input type="radio" id="payment2" name="payment" value="IOU1" /> <label for="payment2">I Owe You</label></li>
+    <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] Add a Payment method</a></li>
+  </ol>
 </p>
+
 <button id="pay">Pay</button>
+<script>
+/* Un-comment to Automate for develping second step of wizard
+window.addEventListener('load', function () {
+  $('#add-payment-method-button').click();
+});
+*/
+</script>

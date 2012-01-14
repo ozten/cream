@@ -1,8 +1,56 @@
 body {
-  padding: 50px;
+  padding: 20px 30px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
-
 a {
   color: #00B7FF;
+}
+header h1 {
+  float: left;
+  margin: 0px auto auto 0px;
+}
+header nav ul {
+  float: left;
+}
+header nav ul li {
+  float: left;
+  list-style: none;
+}
+#content {
+  clear: both;
+}
+#content #existing-payment {
+  float: left;
+  width: 30%;
+}
+#content #existing-payment h2 {
+  margin-top: 0px;
+}
+#content #existing-payment ol {
+  padding-left: 0px;
+}
+#content #existing-payment ol li {
+  list-style: none;
+}
+#content #add-payment {
+  margin-left: 30%;
+  width: 60%;
+  background-color: #DDD;
+}
+#content #add-payment .wizard2 > div:first-child {
+  border: solid 1px #000;
+  margin-bottom: 10px;
+  padding: 0px 10px 10px 10px;
+}
+#content #add-payment .wizard2 > div h3 {
+  margin: 0px auto;
+}
+#content #add-payment #chooser ul li {
+  list-style: none;
+}
+#content #add-payment #chooser ul li a {
+  color: #000;
+}
+footer {
+  clear: both;
 }
