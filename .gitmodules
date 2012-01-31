@@ -1,0 +1,3 @@
+[submodule "www/ball-of-wax"]
+	path = www/ball-of-wax
+	url = git://github.com/ozten/ball-of-wax.git
