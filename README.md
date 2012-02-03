@@ -11,6 +11,8 @@ makes life easier.
 
   * GetTheMoney - Simplest way to pay and GET PAYED!
   * Wallet - LIFT API for cross-domain payment
+  * Ball of Wax Audio Quarterly - Tablet optimized 
+    "digital linear notes" with in-App purchase
 
 Code organization
 
@@ -18,17 +20,18 @@ Code organization
     \---nginx.conf - Hosts c.r.e.a.m-ery.co 
     \---get_the_money/ - Node.js app
     \---wallet/ - Node.js app hosting include.js
+    \---ball-of-wax/ - git submodule
 
 The navigator.payz API has the following inputs:
 amount, accepted_types, merchant_email, and options
 
-All options are optional:a
+All options are optional:
   * **payee** - optional - email address of customer
   * **failure** - callback function
   * **description** - payment description
   * **complete** - callback function. Error will be null if everything was successful or a string if there was a problem. The complete callback will never be invoked if user cancels. See {Reciept} below for reiept format.
 
-Example:
+Example complete callback:
 
     function (error, reciept) {
 
@@ -36,7 +39,7 @@ Example:
 
   * cancel_callback - invoked if user cancels when entering payment info
 
-Reciept object: The second input to the callback is a reciept. It has the following properties:
+Reciept object: The second input to the callback is a reciept. Example:
 
     {
       transaction_id: '32lkj432kj42l4j',
@@ -48,13 +51,15 @@ Reciept object: The second input to the callback is a reciept. It has the follow
       assertion: 'zsfdslkjfds3j324... really long string ... sdkjf',
     }
 
-**assertion** - A reciept *should not* be trusted without server side verificaiton that the reciept is valid. Values of the reciept object are available immediately for use client-side in presenting a reciept to the user. Assertion verification will provide additional information, which is useful for your merchant backend system.
+It has the following properties:
 
-**amount** is in cents, so 1000 is 10.00.
+  * **assertion** - A reciept *should not* be trusted without server side verificaiton that the reciept is valid. Values of the reciept object are available immediately for use client-side in presenting a reciept to the user. Assertion verification will provide additional information, which is useful for your merchant backend system.
 
-**payment_id** is a user distinguishable portion of their payment routing information, such as the last 4 digits of a credit card.
+  * **amount** is in cents, so 1000 is 10.00.
 
-**transaction_id** - Globably unique id for this transaction
+  * **payment_id** is a user distinguishable portion of their payment routing information, such as the last 4 digits of a credit card.
+
+  * **transaction_id** - Globably unique id for this transaction
 
 Code example:
 
@@ -77,9 +82,6 @@ $10 from Alice.
 Dependencies:
   * Nginx
   * Redis
+  * MySQL
   * node 0.6.6
   * ozten/connect-browserid
-
-TODOs:
-
-* Make /include.js a node route and include hostname via config
