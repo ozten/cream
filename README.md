@@ -1,5 +1,6 @@
+# C.R.E.A.M-ery.co # 
 C.R.E.A.M-ery.co is a set of experiments around giving users 
-fiscal agency across the web. Huh?
+*fiscal agency* across the web. Huh?
 
 It's a **very early** stages playground for exploring
 The Future Of Money technologies such as mobile wallets,
@@ -14,7 +15,7 @@ makes life easier.
   * Ball of Wax Audio Quarterly - Tablet optimized 
     "digital linear notes" with in-App purchase
 
-Code organization
+## Code organization ##
 
     www - collection of experiments
     \---nginx.conf - Hosts c.r.e.a.m-ery.co 
@@ -22,7 +23,8 @@ Code organization
     \---wallet/ - Node.js app hosting include.js
     \---ball-of-wax/ - git submodule
 
-The navigator.payz API has the following inputs:
+## API ##
+The `navigator.payz` API has the following inputs:
 amount, accepted_types, merchant_email, and options
 
 All options are optional:
@@ -30,6 +32,7 @@ All options are optional:
   * **payee** - optional - email address of customer
   * **failure** - callback function
   * **description** - payment description
+  * **cancel_callback** - invoked if user cancels when entering payment info
   * **complete** - callback function. Error will be null if everything was successful or a string if there was a problem. The complete callback will never be invoked if user cancels. See {Reciept} below for reiept format.
 
 Example complete callback:
@@ -37,8 +40,6 @@ Example complete callback:
     function (error, reciept) {
 
     }
-
-  * cancel_callback - invoked if user cancels when entering payment info
 
 Reciept object: The second input to the callback is a reciept. Example:
 
@@ -77,7 +78,7 @@ Code example:
 
     navigator.payz(1000, accepted_types, billing@example.com, options);
 
-We can see that example.com's webapge would invoke this script, to collect
+We can see that example.com's webpage would invoke this script, to collect
 $10 from Alice.
 
 Dependencies:
