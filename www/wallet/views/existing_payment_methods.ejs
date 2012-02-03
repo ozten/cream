@@ -1,0 +1,11 @@
+  <h2>Existing</h2>
+  <ol id="existing-payment-methods">
+    <% for (var i=0; i < existing_methods.length; i++) {
+         var method = existing_methods[i]; 
+         if (method.type == 'VISA') { %>
+           <li><%= method.type %> <%= method.display %> expires <%= method.expires %></li>
+      <% } else if (method.type == 'IOU') { %>
+           <li><%= method.type %></li>
+      <% } %>           
+    <% } %>
+  </ol>

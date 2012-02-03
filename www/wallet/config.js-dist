@@ -1,0 +1,4 @@
+exports.stripe_sekrit = 'From Stripe Panel';
+
+exports.session_length = 1000 * 60 * 60 * 6; // 6 hour session
+exports.session_sekrit = 'Hobo LaRue, the most famous of hobos.';
