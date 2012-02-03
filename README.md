@@ -30,7 +30,6 @@ amount, accepted_types, merchant_email, and options
 All options are optional:
 
   * **payee** - optional - email address of customer
-  * **failure** - callback function
   * **description** - payment description
   * **cancel_callback** - invoked if user cancels when entering payment info
   * **complete** - callback function. Error will be null if everything was successful or a string if there was a problem. The complete callback will never be invoked if user cancels. See {Reciept} below for reiept format.
@@ -81,7 +80,7 @@ Code example:
 We can see that example.com's webpage would invoke this script, to collect
 $10 from Alice.
 
-Dependencies:
+## Dependencies ##
 
   * Nginx
   * Redis
