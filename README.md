@@ -26,6 +26,7 @@ The navigator.payz API has the following inputs:
 amount, accepted_types, merchant_email, and options
 
 All options are optional:
+
   * **payee** - optional - email address of customer
   * **failure** - callback function
   * **description** - payment description
@@ -80,6 +81,7 @@ We can see that example.com's webapge would invoke this script, to collect
 $10 from Alice.
 
 Dependencies:
+
   * Nginx
   * Redis
   * MySQL
