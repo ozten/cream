@@ -18,9 +18,62 @@ Code organization
     \---get_the_money/ - Node.js app
     \---wallet/ - Node.js app hosting include.js
 
+The navigator.payz API has the following inputs:
+amount, accepted_types, merchant_email, and options
+
+All options are optional:
+* payee - optional - email address of customer
+* failure - callback function
+* description - payment description
+* complete - callback function. Error will be null if everything was 
+  successful or a string if there was a problem. The complete callback will never be invoked if user cancels. See {Reciept} below for reiept format.
+Example:
+    function (error, reciept) {
+
+    }
+* cancel_callback - invoked if user cancels when entering payment info
+
+Reciept object: The second input to the callback is a reciept. It has the following properties:
+{
+  transaction_id: '32lkj432kj42l4j',
+  created: 'Tue, 10 Jan 2012 06:30:03 GMT',
+  amount: 1000,
+  currency: 'USD',
+  payment_type: 'VISA',
+  payment_id: '3666',
+  assertion: 'zsfdslkjfds3j324... really long string ... sdkjf',
+}
+
+assertion - A reciept *should not* be trusted without server side verificaiton that the reciept is valid. Values of the reciept object are available immediately for use client-side in presenting a reciept to the user. Assertion verification will provide additional information, which is useful for your merchant backend system.
+
+Amount is in cents, so 1000 is 10.00.
+
+payment_id is a user distinguishable portion of their payment routing information, such as the last 4 digits of a credit card.
+
+transaction_id - Globably unique id for this transaction
+
+Code example:
+
+    var accepted_types = ['VISA', 'MASTERCARD', 'IOU'],
+        options = {
+          payee: 'alice@example.com',
+          description: 'Cheddar',
+          complete: function (error, reciept) {
+            hideProcessing();
+            showReciept(reciept);
+            $.ajax('/verify', {reciept: reciept}, confirmReciept);        
+          }
+    };
+
+    navigator.payz(1000, accepted_types, billing@example.com, options);
+
 Dependencies:
 
 * Nginx
 * Redis
 * node 0.6.6
 * ozten/connect-browserid
+
+TODOs:
+
+* Make /include.js a node route and include hostname via config

@@ -6,11 +6,11 @@ $('#make-payment').submit(function(event) {
   navigator.payz(amount, ['VISA'],
                  // Which side has recipient
                  {
-                   payee: 'shout@ozten.com',
+                   reciever: 'shout@ozten.com',
                    //TODO How do we know what business this is?
                    // TODO how do we route their pahyment?
-                   reciever: 'eozten@yahoo.com',
-                   reason: 'Buy used couch',
+                   payee: 'eozten@yahoo.com',
+                   description: 'Buy used couch',
                    success: function (reciept) { console.info(reciept); },
                    failure: function (error) { console.error(error); }
                  });

@@ -6,6 +6,7 @@ var crypto = require('crypto'),
     qs = require('querystring'),
     util = require('util'),
 
+    conf = require('../config'),
     profiles = require('../lib/profiles'),
     browserid = require('connect-browserid'),
    payments = require('../lib/payments');
@@ -78,8 +79,8 @@ exports.ask_for_cash = function(req, res){
           if (err) throw err;
         console.log('format message');
           var message_body = util.format('%s has asked you for %s.\n' +
-                'You can pay them by visiting:\n' + 
-                'http://10.0.1.13:3000/pay/%s/%s\n', profile['fullName'], amount,
+                'You can pay them by visiting:\n' + conf.browserid_audience +
+                '/pay/%s/%s\n', profile['fullName'], amount,
                                          qs.escape(email), qs.escape(payReq.id));
           console.log(message_body);
           mail.message({
@@ -116,6 +117,9 @@ exports.pay = function(req, res){
   // 1) no auth - capture details to session and redirect
   // 2) fresh auth - check session and continue
   // 3) auth - use request params and continue
+
+  // TODO no network... hardcoded user
+  req.user = 'shout@ozten.com';
   if (! req.user) {
       console.log("copying", req.params);
       var pay_info = { email: req.params.email,
@@ -147,7 +151,8 @@ exports.pay = function(req, res){
 exports.localVars = function (req, res, next) {
   var vars = {
     title: 'C.R.E.A.M, Get the Money',
-    authenticated: false
+    authenticated: false,
+    cream_host: conf.browserid_audience.replace('3000', '3001')
   };
   console.log("localVars is running");
   if (req.user) {

@@ -3,7 +3,12 @@
   , "version": "0.0.1"
   , "private": true
   , "dependencies": {
-      "express": "2.5.2"
+      "connect-browserid": ""
+    , "connect-redis": ""
+    , "express": "2.5.2"
     , "ejs": "0.6.1"
+    , "mysql": ""
+    , "redis": ""
+    , "stripe": ""
   }
 }

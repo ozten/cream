@@ -1,6 +1,6 @@
 <h1>Pay</h1>
 <p>Amount: <b id="amount"></b></p>
-<p>Reason: <span id="reason"></span></p>
+<p>Reason: <span id="description"></span></p>
 <p><strong id="reciever"></strong> accepts:
   <ol id="payment-choices">
     <!-- TODO base on accepted type -->
@@ -9,7 +9,19 @@
     <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] Add a Payment method</a></li>
   </ol>
 </p>
-
+<div id="login-form">
+  <% if (user) { %>
+    <p>Logged in as <span class="email-address"><%= user %></span></p>
+  <% } else { %>
+    <form action="">
+      <p>DEMO Gawds... Sign in</p>
+      <button class="browserid">Sign in</button>
+    </form>
+  <% } %>
+</div>
+<div id="existing-payment">
+  <%- partial('existing_payment_methods') %>
+</div>
 <button id="pay">Pay</button>
 <script>
 /* Un-comment to Automate for develping second step of wizard

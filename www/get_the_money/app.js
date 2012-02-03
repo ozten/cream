@@ -8,7 +8,8 @@ var express = require('express'),
     browserid = require('connect-browserid'),
     RedisStore = require('connect-redis')(express);
 
-var profiles = require('./lib/profiles');
+var conf = require('./config'),
+    profiles = require('./lib/profiles');
 
 var app = module.exports = express.createServer();
 
@@ -22,11 +23,11 @@ app.configure(function(){
   app.use(express.responseTime());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'TODO move to config',
+  app.use(express.session({ secret: conf.session_sekrit,
                             store: new RedisStore }));
 
-  app.use(browserid.authUser({ secret: "yabba dabba do",
-                               audience: 'http://10.0.1.13:3000' }));
+  app.use(browserid.authUser({ secret: conf.browserid_sekrit,
+                               audience: conf.browserid_audience }));
   app.use(routes.localVars);
   app.use(app.router);
 
@@ -73,5 +74,6 @@ app.get('/logout', browserid.logout({ next: '/' }));
 
 // Startup
 app.listen(3000);
+console.log(app.address());
 
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);

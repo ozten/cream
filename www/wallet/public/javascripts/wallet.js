@@ -1,5 +1,6 @@
 $(document).ready(function () {
     var doit;
+    var user_email;
     console.info('Setting up WinChan onOpen');
     WinChan.onOpen(function(origin, args, cb) {
       console.info('onOpen just got real', args);
@@ -12,11 +13,19 @@ $(document).ready(function () {
       // calling it indicated the window is done and can be closed.
       console.info('origin=' + origin);
       console.info(args);
+      // TODO /pay should load a shell of a page... 
+      // If user is already logged into wallet, then HTML will show their
+      // Payment methods
+      // If not, then a requiredEmail will be used which is the same as their
+      // args.payee
+      // After login, payment methods would be displayed
       $('#amount').text('$' + args.amount / 100);
       $('#reciever').text(args.reciever);
       // accepted-types, payee, 
-      $('#reason').text(args.reason);
-   
+      $('#description').text(args.description);
+      window.a = args;
+      console.log(args);
+      user_email = args.payee;
       doit = function () { cb({
           date: new Date(),
           amount: args.amount,
@@ -59,6 +68,25 @@ $(document).ready(function () {
         });
       });
     });
+
+  $('.browserid').click(function (event) {
+    event.preventDefault();
+    var opts = {
+      requiredEmail: user_email
+    };
+    navigator.id.get(function (assertion) {
+      if (assertion) {
+        $.post("/auth", {assertion: assertion}, function(res) {
+          if (res.status && res.status == "okay") {
+            $('.email-address').text(window.email);
+            $('#existing-payment').load('/existing-payment');
+          }
+        });
+           
+      }
+    }, opts);
+  });
+
 });
 
 function doStripe() {

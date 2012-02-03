@@ -1,38 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html>pp
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <title><%= title %></title>
+    <link rel="stylesheet" href="/javascripts/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.css" />    
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <header><h1><%= title %></h1>
+    <div data-role="page">
+    <div data-role="header"><h1><%= title %></h1>
       <nav>
         <ul>
           <% if (authenticated) { %>
-            <li><a href="/ask-for-cash">Ask for Cash</a></li>
-            <li><a href="/recent">Recent Activity</a></li>
-            <li><a href="/reciepts">Reciepts</a></li>
+            <li><a data-role="button" href="/ask-for-cash">Ask for Cash</a></li>
+            <li><a data-role="button" href="/recent">Recent Activity</a></li>
+            <li><a data-role="button" href="/reciepts">Reciepts</a></li>
             <li id="user-nav"><img src="<%= gravatar %>" /><%= user %> </li>
-            <li><a href="/logout">Log out</a></li>
+            <li><a data-role="button" href="/logout">Log out</a></li>
           <% } else { %>
-            <li><a href="/about">About</a></li>
+            <li><a data-role="button" href="/about">About</a></li>
             <li><button class="bid">Sign In</button></li>
           <% } %>
         </ul>
       </nav>
-    </header>
-    <div id="content">
+    </div><!-- data-role=header -->
+    <div id="content" data-role="content">
       <%- body %>
-    </div>
-    <footer>Dollar, dollar bill y'll</footer>
+    </div><!--  data-role=content -->
+    <footer data-role="footer">Dollar, dollar bill y'll</footer>
+    </div><!-- data-role=page -->
     <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script -->
     <script src="/javascripts/lib/jquery-1.7.1.min.js"></script>
     <script src="https://browserid.org/include.js"></script>
     <script src="/javascripts/browserid.js"></script>
+    <script src="/javascripts/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.js"></script>
 
     <!-- // TODO include.js should bring winchan, etc -->
-    <script src="http://10.0.1.13:3001/javascripts/lib/winchan.js"></script>
-    <script src="http://10.0.1.13:3001/javascripts/include.js"></script>
+    <script src="<%= cream_host %>/javascripts/lib/winchan.js"></script>
+    <script src="<%= cream_host %>/include.js"></script>
 <script>
 $(document).ready(function () {
 

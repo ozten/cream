@@ -1,23 +1,20 @@
-header ul {
+[data-role=header] ul {
   padding-left: 0px;
 }
-header ul li {
+[data-role=header] ul li {
   float: left;
   list-style: none;
+  margin-left: 15px;
 }
-header ul li a {
-  border: solid 1px #DDD;
-  padding: 20px;
-  margin: auto 5px;
-}
-header ul #user-nav {
+[data-role=header] ul #user-nav {
   padding: 0px;
   margin: 0px;
 }
-header ul #user-nav img {
+[data-role=header] ul #user-nav img {
   width: 50px;
   height: 50px;
   margin-top: -15px;
+  margin-left: 15px;
 }
 #content {
   clear: both;

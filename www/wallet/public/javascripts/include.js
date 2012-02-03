@@ -3,7 +3,7 @@
 
 $(document).ready(function () {
 
-var site = 'http://10.0.1.13:3001';
+var site = 'IP_ADDRESS';
 console.log('definging payz');
 console.log(window.WinChan);
 // TODO include winchan, package with almond.js?
@@ -15,7 +15,7 @@ console.log('going for it');
     var defaults = {
       success: function (recipet) {},
       failure: function (err) {},
-      reason: ""
+      description: ""
     };
     var opt = $.extend(true, {}, defaults, options);
     if (window.WinChan)
@@ -31,6 +31,7 @@ console.log('going for it');
       }
     }, function(err, r) {
       // err is a string on failure, otherwise r is the response object
+      console.log('include.js winchan,pen callback', err, r);
       if (err) { 
         opt.failure(err); 
       } else {

@@ -5,7 +5,13 @@
 
 var express = require('express'),
     RedisStore = require('connect-redis')(express),
-    routes = require('./routes');
+    routes = require('./routes'),
+
+    browserid = require('connect-browserid'),
+
+    db = require('./lib/db'),
+    conf = require('./config'),
+    userdb = require('./lib/userdb');
 
 
 var app = module.exports = express.createServer();
@@ -20,8 +26,10 @@ app.configure(function(){
   app.use(express.responseTime());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'TODO move to config',
+  app.use(express.session({ secret: conf.session_sekrit,
                             store: new RedisStore }));
+  app.use(browserid.authUser({ secret: conf.browserid_sekrit,
+                               audience: conf.browserid_audience }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -36,9 +44,27 @@ app.configure('production', function(){
 
 // Routes
 
+app.get('/include.js', routes.lift);
+
 app.get('/', routes.index);
 
 app.get('/pay', routes.pay);
+app.get('/existing-payment', routes.existing_payment);
+
+app.post('/auth', browserid.auth());
+browserid.events.on('login', function (verified_email, req, resp) {
+  console.log('logged in event, creating user');
+  console.log('vep', verified_email);
+  console.log('req', req);
+  console.log('resp', resp);
+  db.withDb(function (err, conn, db) {
+    if (err) { console.error(err); return; }
+    userdb.create_user(conn, verified_email, function (err, db_res) {
+      console.log('Created user', err, db_res);
+    });
+  });
+});
+app.get('/logout', browserid.logout());
 
 // AJAX partial
 app.get('/add-payment-method', routes.add_payment_method);
