@@ -2,13 +2,37 @@ var util = require('util'),
 
     redis = require('redis'),
     client = redis.createClient(),
+    Step = require('step'),
     uuid = require('node-uuid');
 
-exports.recent = function (email) {
+exports.recent = function (email, cb) {
+/*
+  var res = [];
+  Step(
+    function () {
+    client.llen('account-' + email, this);
+    }, 
+    function (err, len) {
+      redis.print(err, len);
+      for (var i=0; i<len; i++) {
+        (function (index) {
+          client.lindex('account-' + email, index, function (err, key) {
+            if (index == len - 1) {
 
+            }
+          });
+        })(i);
+      }
+    },
+    function () {
+*/
+      cb([{email: 'TODO', fullName: 'TODO', activity: 'PAID', amount: 1000, created: '12/12/2011 3:54 -700'}]);
+/*
+    });
+  //);
   //client.hgetall(key, function (err, obj) {
+*/
 
-  return [{email: 'TODO', fullName: 'TODO', activity: 'PAID', amount: 1000, created: '12/12/2011 3:54 -700'}];
 };
 
 /*
@@ -36,6 +60,8 @@ exports.paymentRequested = function (requestorEmail, requesteeEmail, amount, cb)
   client.hmset(key, paymentRequest, function (err, resp) {
     redis.print(err, resp);
     console.log("We're back after saving payment requested. Err=%s", err);
+    client.rpush('account-' + requestorEmail, key, redis.print);
+    client.rpush('account-' + requesteeEmail, key, redis.print);
     cb(err, paymentRequest);
   });
 };
@@ -46,5 +72,28 @@ exports.paymentRequest = function (id, cb) {
     redis.print(err, pay_req);
     console.log('pay_req', pay_req);
     cb(err, pay_req);
+  });
+};
+
+exports.recordReciept = function (reciept, cb) {
+  var key = util.format('reciept-%s', reciept.transaction_id);
+  console.log('Creating ', key);
+  var next = function (err, resp) {
+   redis.print(err, resp);
+    console.log("We're back after saving payment requested. Err=%s", err);
+    client.rpush('account-' + reciept.merchant_email, key, redis.print);
+    client.rpush('account-' + reciept.customer_email, key, redis.print);
+    cb(err, reciept);
+  };
+  client.hmset(key, reciept, next);
+};
+
+exports.reciept = function (id, cb) {
+  var key = util.format('reciept-%s', id);
+  console.log('retrieving', key);
+  client.hgetall(key, function (err, reciept) {
+    redis.print(err, reciept);
+    console.log('reciept', reciept);
+    cb(err, reciept);
   });
 };

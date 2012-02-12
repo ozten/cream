@@ -4,13 +4,19 @@ var config = require('../config');
 var fs = require('fs'),
     path = require('path'),
     redis = require('redis').createClient(),
-    stripe = require('stripe')(config.sekrit_key),
+    stripe = require('stripe')(config.stripe_sekrit), // Currently tied to one merchant...
     util = require('util');
+
+console.info('loading with seckrit key', config.stripe_sekrit);
 
 var browserid = require('connect-browserid'),
     db = require('../lib/db'),
     userdb = require('../lib/userdb'),
     walletdb = require('../lib/walletdb');
+
+redis.on('error', function (err) {
+  // We handle redis errors at the top level
+});
 
 /*
  * GET home page.
@@ -37,14 +43,19 @@ exports.index = function(req, res){
 };
 
 var existing_pay_methods = function (email, cb) {
+  var pay_meths = [];
   db.withDb(function (err, conn, db) {
     if (err) { console.error(err); return cb(err, []); }
     userdb.get_user(conn, email, function (err, user) {    
       if (err) { console.error(err); return cb(err, []); }
       if (user.customer_id) {
-        walletdb.get_stripe_methods(user.customer_id, function (err, cc) {
+        console.log('going to stripe for method ', user.customer_id);
+        walletdb.get_stripe_methods(user.customer_id, function (err, customer) {
           if (err) { console.error(err); return cb(err, []); }
+          var cc = customer.active_card;
+          console.log(cc);
           if (cc) {
+              console.log('pushing');
             pay_meths.push({
               type: cc.type,
               display: util.format('Ends in %s', cc.last4),
@@ -54,6 +65,7 @@ var existing_pay_methods = function (email, cb) {
           pay_meths.push({
             type: 'IOU'
           });
+          console.log('loaded ', pay_meths);
           cb(null, pay_meths);
         });
       } else {
@@ -71,6 +83,7 @@ exports.pay = function(req, res){
     pay_meths = existing_pay_methods(req.user, function (err, pay_meths) {
       res.render('pay', {
                  title: 'Wallet',
+                 util: util,
                  existing_methods: pay_meths});
     });
 
@@ -114,6 +127,7 @@ exports.stripe_add_payment = function (req, resp) {
     var paymentType = req.body['payment-type'];
     var expires = util.format('%s/%s', req.body['visa-expiration-month'],
                                        req.body['visa-expiration-year'].slice(-2));
+    console.log('creatring with stripe', email);
     console.log('payment-type', paymentType);
     console.log('expires', expires);
 
@@ -122,11 +136,18 @@ exports.stripe_add_payment = function (req, resp) {
        { email: email, card: req.body.stripeToken },
        function(err, customer) {
           if (err) {
-             console.log("Couldn't create the customer record");
-             return;
+             console.log(err, customer);
+             console.log("Couldn't create the customer record", err);
+             return resp.send(err, 500);
           }
           var key = util.format("stripe-customerid-%s", email),
               pay_meth_key;
+
+          // mysql and redis TODO pick a horse
+          db.withDb(function (err, conn, _db) {
+            userdb.create_stripe_customer(conn, email, customer.id);
+          });
+
           redis.set(key, customer.id);
 
           // List of all stripe customer ids
@@ -146,4 +167,57 @@ exports.stripe_add_payment = function (req, resp) {
           console.log("customer id", customer.id);
           resp.redirect('/pay');
        });
+};
+
+exports.pay_transaction = function (req, resp) {
+  // Demo GAWDs
+  // Payer
+  req.user = 'eozten@yahoo.com';
+  db.withDb(function (err, conn, _db) {
+    userdb.get_user(conn, req.user, function (err, user) {
+      if (! user.customer_id) throw "Error, no stripe customer info";
+
+    console.log('description=', req.body['description']);
+  
+    var paydata = {
+      amount: req.body['amount'],
+      currency: 'usd',
+      customer: user.customer_id,
+      description: req.body['description']
+    };
+  console.log(req.body['payment_type']);
+  if (req.body['payment_type'].toUpperCase() != 'VISA_1') {
+    throw "TODO: right now this is stripe active card only";
+  }
+  console.log(req.user);
+  console.log(req.body['amount']);
+
+  console.log(req.body['description']);
+  // Payee - Currently shout@ozten.com  stripe account...
+/* TODO merchant email -> stripe account */
+  stripe.charges.create(paydata,
+      function (err, charge) {
+        if (err) {
+          console.error(err);
+          resp.send(err, 500);
+        } else {
+          var pay_info = util.format("%s %d", charge.card.type, charge.card.last4);
+          console.log('charge info', charge);
+          // TODO - purchase dashboard?
+          var data = {
+            date: new Date(charge.created),
+            amount: charge.amount,
+            description: charge.description,
+            currency: charge.currency,
+            payment_type: pay_info,
+            merchant_email: 'shout@ozten.com', /* TODO */
+            transaction: charge.id
+          };
+          resp.send(JSON.stringify(data), {'Content-Type': 'application/json'});
+        }
+    });//charges.create
+
+    });//get_user
+  });//withDb
+
 };

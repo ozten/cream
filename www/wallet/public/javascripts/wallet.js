@@ -22,15 +22,29 @@ $(document).ready(function () {
       $('#amount').text('$' + args.amount / 100);
       $('#reciever').text(args.reciever);
       // accepted-types, payee, 
+      console.log(args);
       $('#description').text(args.description);
       window.a = args;
       console.log(args);
       user_email = args.payee;
-      doit = function () { cb({
-          date: new Date(),
-          amount: args.amount,
-          payment_type: args.accepted_types[0],
-          transaction: "x3423"
+      doit = function () {
+        var pt = $('[name=payment]:checked').val();
+        $.ajax('/pay-transaction', {
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            amount: args.amount,
+            description: args.description,
+            payment_type: pt
+            /* TODO merchant email */            
+          },
+          error: function (data, status, jqXhr) {
+            // TODO
+            alert(data.error);
+          },
+          success: function (data, status, jqXhr) {
+            cb(data);
+          }
         });
       };
     });

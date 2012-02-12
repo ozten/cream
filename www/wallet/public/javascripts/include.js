@@ -27,7 +27,8 @@ console.log('going for it');
         amount: amount,
         accepted_types: accepted_types,
         payee: opt.payee,
-        reciever: opt.reciever
+        reciever: opt.reciever,
+        description: opt.description
       }
     }, function(err, r) {
       // err is a string on failure, otherwise r is the response object

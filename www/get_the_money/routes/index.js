@@ -9,7 +9,8 @@ var crypto = require('crypto'),
     conf = require('../config'),
     profiles = require('../lib/profiles'),
     browserid = require('connect-browserid'),
-   payments = require('../lib/payments');
+    format_money = require('../lib/money_util').format_money,
+    payments = require('../lib/payments');
 
 // Routes
 
@@ -41,12 +42,14 @@ exports.register = function (req, res) {
 };
 
 exports.recent = function(req, res) {
-  resp = browserid.enforceLogIn(req, res);
-  if (resp) return resp;
+  req.user = 'shout@ozten.com';
+  //resp = browserid.enforceLogIn(req, res);
+  //if (resp) return resp;
   profiles.getProfile(req.user, req, res, function (exists, profile) {
     if (exists) {
-      var recentPayments = payments.recent(req.user);
-      res.render('recent', {payments: recentPayments, profile: profile});
+      payments.recent(req.user, function (recentPayments) {
+        res.render('recent', {payments: recentPayments, profile: profile});
+      });
     } else {
       res.redirect('/register');
     }
@@ -60,8 +63,10 @@ exports.direct = function (template) {
 };
 
 exports.ask_for_cash = function(req, res){
-  resp = browserid.enforceLogIn(req, res);
-  if (resp) return resp;
+  console.info('ask_for_cash');
+  req.user = 'shout@ozten.com';
+  //resp = browserid.enforceLogIn(req, res);
+  //if (resp) return resp;
   profiles.getProfile(req.user, req, res, function (exists, profile) {
     util.debug(util.format('getProfile callback %s %s', exists, profile));
     util.debug(exists);
@@ -118,14 +123,11 @@ exports.pay = function(req, res){
   // 2) fresh auth - check session and continue
   // 3) auth - use request params and continue
 
-  // TODO no network... hardcoded user
-  req.user = 'shout@ozten.com';
   if (! req.user) {
       console.log("copying", req.params);
       var pay_info = { email: req.params.email,
                        pay_req_id: req.params.pay_req_id};
       req.session.pay_info = pay_info;
-      req.session.foo = 'hello world';
       console.log(req.session);
       res.render('pay_login');
 
@@ -143,7 +145,45 @@ exports.pay = function(req, res){
   payments.paymentRequest(pay_req_id, function (err, pay_req) {
     console.log(pay_req);
     //requesteeEmail: requesteeEmail,
-    res.render('pay', { requestorEmail: pay_req['requestorEmail'], amount: pay_req.amount });
+    res.render('pay', { requestorEmail: pay_req['requestorEmail'], 
+                        display_amount: format_money(pay_req.amount),
+                        amount: pay_req.amount });
+  });
+};
+
+exports.create_reciept = function (req, resp) {
+  req.user = 'eozten@yahoo.com';
+  //if (browserid.enforceLogIn(req, resp)) return;
+  var tx_id = req.body['transaction_id'];
+      reciept = {
+        amount: req.body['actual_amount'],
+        currency: req.body['currency'],
+        date: req.body['date'],
+        customer_email: req.user,
+        merchant_email: req.body['merchant_email'],
+        payment_type: req.body['payment_type'],
+        transaction_id: tx_id
+      },
+      url = util.format('/reciept/%s', tx_id);
+  console.log("creating ", reciept);
+  payments.recordReciept(reciept, function (err, pay_req) {
+    if (err) {
+      resp.send(err, 500);
+    } else {
+      console.log("redirecting ", url);
+      resp.redirect(url);
+    }
+  });
+};
+
+exports.reciept = function (req, resp) {
+  req.user = 'eozten@yahoo.com';
+  //if (browserid.enforceLogIn(req, resp)) return;
+  payments.reciept(req.params.transaction_id, function (err, reciept) {
+    if (err)
+      resp.send(err, 500);
+    else
+      resp.render('reciept', {reciept: reciept, format_money: format_money});
   });
 };
 

@@ -1,4 +1,5 @@
 $('.bid').click(function () {
+
   window.navigator.id.get(function (assertion) {
     $.post('/auth', {
       assertion: assertion

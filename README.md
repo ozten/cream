@@ -10,8 +10,8 @@ Why is it so hard to give and receive money? What if there were
 a simple, open web standard that protects users identities and
 makes life easier.
 
-  * GetTheMoney - Simplest way to pay and GET PAYED!
   * Wallet - LIFT API for cross-domain payment
+  * GetTheMoney - Simplest way to pay and GET PAYED!
   * Ball of Wax Audio Quarterly - Tablet optimized 
     "digital linear notes" with in-App purchase
 
@@ -87,3 +87,7 @@ $10 from Alice.
   * MySQL
   * node 0.6.6
   * ozten/connect-browserid
+
+## TODO ##
+
+* Get the Money Recent screen

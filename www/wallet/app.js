@@ -4,6 +4,7 @@
  */
 
 var express = require('express'),
+    redis = require('redis'),
     RedisStore = require('connect-redis')(express),
     routes = require('./routes'),
 
@@ -13,8 +14,15 @@ var express = require('express'),
     conf = require('./config'),
     userdb = require('./lib/userdb');
 
+require('redis').createClient().on("error", function(err) {
+  console.error(err);
+});
 
 var app = module.exports = express.createServer();
+
+var redis_client = redis.createClient();
+
+redis_client.on('error', function (err) { console.error(err); });
 
 // Configuration
 
@@ -27,9 +35,10 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({ secret: conf.session_sekrit,
-                            store: new RedisStore }));
+                            store: new RedisStore({client: redis_client}) }));
   app.use(browserid.authUser({ secret: conf.browserid_sekrit,
                                audience: conf.browserid_audience }));
+  app.use(browserid.guarantee_audience);
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
@@ -70,6 +79,8 @@ app.get('/logout', browserid.logout());
 app.get('/add-payment-method', routes.add_payment_method);
 
 app.post('/stripe-add-payment', routes.stripe_add_payment);
+
+app.post('/pay-transaction', routes.pay_transaction);
 
 app.listen(3001);
 console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
