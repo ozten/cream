@@ -5,34 +5,75 @@ var util = require('util'),
     Step = require('step'),
     uuid = require('node-uuid');
 
-exports.recent = function (email, cb) {
+var munge = function (email, data) {
 /*
+ [{email: 'TODO', fullName: 'TODO', activity: 'PAID', amount: 1000, created: '12/12/2011 3:54 -700'}]
+ */
+  var d = {
+    income: [],
+    payments: [],
+    requests: [],
+    requested: []
+  };
+  for (var i=0; i<data.length; i++) {
+    if (data[i].id) {
+      if (data[i].requestorEmail.toLowerCase() == email.toLowerCase()) {
+        d.requests.push(data[i]);
+      } else {
+        d.requested.push(data[i]);
+      }
+    } else if (data[i].transaction_id) {
+      if (data[i].merchant_email.toLowerCase() == email.toLowerCase()) {
+        d.income.push(data[i]);
+      } else if (data[i].customer_email.toLowerCase() == email.toLowerCase()) {
+        d.payments.push(data[i]);
+      } else {
+        console.error("Email: ", email, " doesn't match results", data[i]);
+        throw "Data mis-match see logs";
+      }
+    } else {
+      throw "Unknown try of recent activity";
+    }
+  }
+  return d;
+};
+
+exports.recent = function (email, cb) {
   var res = [];
   Step(
     function () {
-    client.llen('account-' + email, this);
+      client.llen('account-' + email, this);
     }, 
     function (err, len) {
       redis.print(err, len);
+      var counter = len; // When are we done?
       for (var i=0; i<len; i++) {
         (function (index) {
+          console.log('Getting key', index, ' of ', len);
           client.lindex('account-' + email, index, function (err, key) {
-            if (index == len - 1) {
-
-            }
+            Step(
+              function () {
+                redis.print(err, key);
+                console.log('Got key ', key, ' ');
+                client.hgetall(key, this);
+              },
+              function (err, obj) {
+                redis.print(err, obj);
+                res.push(obj);
+                counter--;
+                console.log('counter=', counter);
+                if (counter == 0) {
+                  console.log('carry on');
+                  console.log('ALL DONE', res); 
+                  cb(munge(email, res));
+                }
+              }
+            );
           });
         })(i);
       }
-    },
-    function () {
-*/
-      cb([{email: 'TODO', fullName: 'TODO', activity: 'PAID', amount: 1000, created: '12/12/2011 3:54 -700'}]);
-/*
     });
   //);
-  //client.hgetall(key, function (err, obj) {
-*/
-
 };
 
 /*

@@ -42,13 +42,21 @@ exports.register = function (req, res) {
 };
 
 exports.recent = function(req, res) {
-  req.user = 'shout@ozten.com';
+  //req.user = 'shout@ozten.com';
+  req.user = 'eozten@yahoo.com';
   //resp = browserid.enforceLogIn(req, res);
   //if (resp) return resp;
   profiles.getProfile(req.user, req, res, function (exists, profile) {
+    console.log(profile);
     if (exists) {
-      payments.recent(req.user, function (recentPayments) {
-        res.render('recent', {payments: recentPayments, profile: profile});
+      payments.recent(req.user, function (recent_data) {
+        res.render('recent', {
+          payments: recent_data.payments, 
+          income: recent_data.income, 
+          requests: recent_data.requests, 
+          requested: recent_data.requested, 
+          profile: profile,
+          format_money: format_money});
       });
     } else {
       res.redirect('/register');

@@ -1,5 +1,29 @@
-<h1>Your Recent Activity</h2>
-<% for (var i=0; i < payments.length; i++) { %>
-  <a href="mailto:<%= payments[i]['email'] %>"><%= payments[i]['fullName'] %></a>
-<% } %>
+<h1>Your Recent Activity</h1>
+<%= profile.email %>
+<h2>Income</h2>
+<% for (var i=0; i < income.length; i++) { 
+     with (income[i]) { %>
+  <div>On <%= date %> <a href="mailto:<%= customer_email %>"><%= customer_email %></a> paid you <%= format_money(amount) %> for TODO description. 
+    Transaction# <a id="<%= transaction_id %>" href="#<%= transaction_id %>"><%= transaction_id %></a></div>
+<%   } 
+   } %>
+<h2>Requested</h2>
+<% for (var i=0; i < requested.length; i++) { 
+     with (requested[i]) { %>
+  <div><a id="<%= id %>" href="mailto:<%= requestorEmail %>"><%= requestorEmail %></a> requested <%= format_money(amount) %> from you. TODO When?</div>
+<%   }
+   } %>
+<h2>Requests</h2>
+<% for (var i=0; i < requests.length; i++) { 
+     with (requests[i]) { %>
+  <div>You requested <%= format_money(amount) %> from <a id="<%= id %>" href="mailto:<%= requesteeEmail %>"><%= requesteeEmail %></a> TODO When?</div>
+<%   }
+   } %>
+<h2>Reciepts</h2>
+<% for (var i=0; i < payments.length; i++) { 
+     with (payments[i]) { %>
+  <div>On <%= date %> you paid <a href="mailto:<%= merchant_email %>"><%= merchant_email %></a> <b><%= format_money(amount) %></b> using <%= payment_type %>. 
+       Transaction# <a id="<%= transaction_id %>" href="#<%= transaction_id %>"><%= transaction_id %></a></div>
+<%   }
+   } %>
 Balance: 
