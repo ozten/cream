@@ -1,14 +1,30 @@
 {
-    "name": "cream-wallet"
-  , "version": "0.0.1"
-  , "private": true
-  , "dependencies": {
-      "connect-browserid": ""
-    , "connect-redis": ""
-    , "express": "2.5.2"
-    , "ejs": "0.6.1"
-    , "mysql": ""
-    , "redis": ""
-    , "stripe": ""
+  "name": "cream-wallet",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "client-sessions": "0.0.3",
+    "connect-browserid": "",
+    "connect-redis": "",
+    "express": "2.5.2",
+    "ejs": "0.6.1",
+    "mysql": "",
+    "redis": "",
+    "stripe": ""
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "author": "ozten <shout@ozten.com> (http://ozten.com)",
+  "description": "LIFT API for simple payment on the web.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ozten/cream.git"
+  },
+  "main": "app.js",
+  "scripts": {
+    "test": "nodeunit test"
   }
 }

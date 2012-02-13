@@ -4,7 +4,9 @@ $('.bid').click(function () {
     $.post('/auth', {
       assertion: assertion
     }, function (data, status, jqxhr) {
-      window.location.reload();
+      setTimeout(function () {
+        window.location.pathname = '/recent';
+      }, 1000);
     });
 
   });

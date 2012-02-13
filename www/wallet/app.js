@@ -1,30 +1,13 @@
-
-/**
- * Module dependencies.
- */
-
-var express = require('express'),
-    redis = require('redis'),
-    RedisStore = require('connect-redis')(express),
-    routes = require('./routes'),
-
-    browserid = require('connect-browserid'),
+var browserid = require('connect-browserid'),
+    clientSessions = require("client-sessions"),
+    express = require('express'),
 
     db = require('./lib/db'),
     conf = require('./config'),
+    routes = require('./routes'),
     userdb = require('./lib/userdb');
 
-require('redis').createClient().on("error", function(err) {
-  console.error(err);
-});
-
 var app = module.exports = express.createServer();
-
-var redis_client = redis.createClient();
-
-redis_client.on('error', function (err) { console.error(err); });
-
-// Configuration
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
@@ -33,9 +16,12 @@ app.configure(function(){
   app.use(express.logger());
   app.use(express.responseTime());
   app.use(express.methodOverride());
-  app.use(express.cookieParser());
-  app.use(express.session({ secret: conf.session_sekrit,
-                            store: new RedisStore({client: redis_client}) }));
+  app.use(clientSessions({
+    cookieName: 'session_state',
+    secret: conf.session_sekrit,
+    duration: 24 * 60 * 60 * 1000 // 1 day
+  }));
+
   app.use(browserid.authUser({ secret: conf.browserid_sekrit,
                                audience: conf.browserid_audience }));
   app.use(browserid.guarantee_audience);
@@ -73,7 +59,7 @@ browserid.events.on('login', function (verified_email, req, resp) {
     });
   });
 });
-app.get('/logout', browserid.logout());
+app.get('/logout', browserid.logout({next:'/'}));
 
 // AJAX partial
 app.get('/add-payment-method', routes.add_payment_method);

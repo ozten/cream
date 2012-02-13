@@ -11,10 +11,8 @@ client.on('error', function (err) {
  * or false, {} if the user doesn't exist.
  */
 exports.getProfile = function (email, req, res, cb) {
-    console.info("Go login for %s", email);
     profile_key = util.format('profile-%s', email.toLowerCase());
     client.hmget(profile_key, ['email', 'Full Name'], function (err, resp) {
-      resp[1] = "Hobo La Rue";
       if (err || 
           (resp[0] === null && resp[1] === null)) {
           //res.redirect('/register');

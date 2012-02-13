@@ -21,12 +21,17 @@ var crypto = require('crypto'),
  */
 
 exports.index = function(req, res){
+  console.log('pre rand', req.session);
+  req.session.rand = Math.random();
+  console.log(util.inspect(req.session));
+  console.log('new rand', req.session);
   res.render('index', {});
+  //res.send('hi');
 };
 
 exports.register = function (req, res) {
-  var resp = browserid.enforceLogIn(req, res);
-  if (resp) return resp;
+  if (browserid.enforceLogIn(req, res)) return;
+
   if (req.method === 'POST') {
     profiles.setProfile({
       email: req.user,
@@ -42,26 +47,22 @@ exports.register = function (req, res) {
 };
 
 exports.recent = function(req, res) {
-  //req.user = 'shout@ozten.com';
-  req.user = 'eozten@yahoo.com';
-  //resp = browserid.enforceLogIn(req, res);
-  //if (resp) return resp;
-  profiles.getProfile(req.user, req, res, function (exists, profile) {
-    console.log(profile);
-    if (exists) {
+  if (browserid.enforceLogIn(req, res)) return;
+  //profiles.getProfile(req.user, req, res, function (exists, profile) {
+    //console.log(profile);
+    //if (exists) {
       payments.recent(req.user, function (recent_data) {
         res.render('recent', {
           payments: recent_data.payments, 
           income: recent_data.income, 
           requests: recent_data.requests, 
           requested: recent_data.requested, 
-          profile: profile,
           format_money: format_money});
       });
-    } else {
-      res.redirect('/register');
-    }
-  });
+    //} else {
+      //res.redirect('/register');
+    //}
+  //});
 }
 
 exports.direct = function (template) {
@@ -71,15 +72,12 @@ exports.direct = function (template) {
 };
 
 exports.ask_for_cash = function(req, res){
-  console.info('ask_for_cash');
-  req.user = 'shout@ozten.com';
-  //resp = browserid.enforceLogIn(req, res);
-  //if (resp) return resp;
-  profiles.getProfile(req.user, req, res, function (exists, profile) {
-    util.debug(util.format('getProfile callback %s %s', exists, profile));
-    util.debug(exists);
-    util.debug(util.inspect(profile));    
-    if (exists) {
+  if (browserid.enforceLogIn(req, res)) return;
+//  profiles.getProfile(req.user, req, res, function (exists, profile) {
+    //util.debug(util.format('getProfile callback %s %s', exists, profile));
+    //util.debug(exists);
+    //util.debug(util.inspect(profile));    
+    //if (exists) {
       if (req.method === 'POST') {
         var email = req.body.email,
             senders_email = req.user,
@@ -91,16 +89,17 @@ exports.ask_for_cash = function(req, res){
         console.log('paymentRequested callback');
           if (err) throw err;
         console.log('format message');
+          //profile['fullName']
           var message_body = util.format('%s has asked you for %s.\n' +
                 'You can pay them by visiting:\n' + conf.browserid_audience +
-                '/pay/%s/%s\n', profile['fullName'], amount,
+                '/pay/%s/%s\n', req.user, amount,
                                          qs.escape(email), qs.escape(payReq.id));
           console.log(message_body);
           mail.message({
             from: senders_email,
             to: [email],
             cc: [senders_email],
-            subject: util.format('%s has asked you for some cream', profile['fullName'])
+            subject: util.format('%s has asked you for some cream', req.user)
           })
           .body(message_body)
 
@@ -110,18 +109,18 @@ exports.ask_for_cash = function(req, res){
             console.log(message_body);
           });
 
-          res.redirect('/ask-for-cash');
+          res.redirect('/recent');
         }); // payments.paymentRequested
 
       // Not POST
       } else {
         res.render('ask_for_cash', {email: 'hobo', _:function (msgid) { return msgid.toUpperCase(); }});
       }
-    } else {
-      console.info("No profile data, please register");
-      res.redirect('/register');
-    }
-  });
+    //} else {
+      //console.info("No profile data, please register");
+      //res.redirect('/register');
+    //}
+  //}); profile
 };
 
 exports.pay = function(req, res){
@@ -160,8 +159,8 @@ exports.pay = function(req, res){
 };
 
 exports.create_reciept = function (req, resp) {
-  req.user = 'eozten@yahoo.com';
-  //if (browserid.enforceLogIn(req, resp)) return;
+  //req.user = 'eozten@yahoo.com';
+  if (browserid.enforceLogIn(req, resp)) return;
   var tx_id = req.body['transaction_id'];
       reciept = {
         amount: req.body['actual_amount'],
@@ -185,8 +184,8 @@ exports.create_reciept = function (req, resp) {
 };
 
 exports.reciept = function (req, resp) {
-  req.user = 'eozten@yahoo.com';
-  //if (browserid.enforceLogIn(req, resp)) return;
+  //req.user = 'eozten@yahoo.com';
+  if (browserid.enforceLogIn(req, resp)) return;
   payments.reciept(req.params.transaction_id, function (err, reciept) {
     if (err)
       resp.send(err, 500);
@@ -200,9 +199,8 @@ exports.localVars = function (req, res, next) {
   var vars = {
     title: 'C.R.E.A.M, Get the Money',
     authenticated: false,
-    cream_host: conf.browserid_audience.replace('3000', '3001')
+    cream_host: conf.wallet_host
   };
-  console.log("localVars is running");
   if (req.user) {
     vars.authenticated = true;
     vars.gravatar = 'http://www.gravatar.com/avatar/' +
@@ -211,7 +209,6 @@ exports.localVars = function (req, res, next) {
   for (var k in vars) {
     res.local(k, vars[k]);
   }
-  console.log("next ma man");
   res.local('page_scripts', []);
   next();
 };

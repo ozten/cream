@@ -1,6 +1,6 @@
 <h1>Reciept</h1>
 <p><%= reciept.date %></p>
 <p>Confirmation Code: <%= reciept.transaction_id %></p>
-<p>Paid <%= format_money(reciept.actual_amount) %><%= reciept.currency %> to <%= reciept.merchant_email %> for <%= reciept.description %></p>
+<p>Paid <%= format_money(reciept.amount) %> <%= reciept.currency.toUpperCase() %> to <%= reciept.merchant_email %> for <%= reciept.description %></p>
 <p>Payment Type: <%= reciept.payment_type %></p>
 <a href="/reciept/<%= reciept.transaction_id %>">Save Reciept</a>.

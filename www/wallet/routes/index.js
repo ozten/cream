@@ -76,9 +76,6 @@ var existing_pay_methods = function (email, cb) {
 };
 
 exports.pay = function(req, res){
-  // Demo GAWDs
-  req.user = 'eozten@yahoo.com';
-  res.local('user', req.user);
   if (req.user) {
     pay_meths = existing_pay_methods(req.user, function (err, pay_meths) {
       res.render('pay', {

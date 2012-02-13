@@ -15,7 +15,6 @@
           <% if (authenticated) { %>
             <li><a data-role="button" href="/ask-for-cash">Ask for Cash</a></li>
             <li><a data-role="button" href="/recent">Recent Activity</a></li>
-            <li><a data-role="button" href="/reciepts">Reciepts</a></li>
             <li id="user-nav"><img src="<%= gravatar %>" /><%= user %> </li>
             <li><a data-role="button" href="/logout">Log out</a></li>
           <% } else { %>
@@ -40,6 +39,7 @@
     <script src="<%= cream_host %>/javascripts/lib/winchan.js"></script>
     <script src="<%= cream_host %>/include.js"></script>
 <script>
+
 $(document).ready(function () {
 
   console.info('hey');
@@ -53,6 +53,7 @@ $('#winning').click(function (event) {
                 function (error) { console.error(error); });
   });
 });
+
 </script>
   <% for (var i=0; i < page_scripts.length; i++) { %>
     <script src="<%= page_scripts[i] %>"></script>

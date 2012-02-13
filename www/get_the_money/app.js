@@ -1,23 +1,23 @@
-
-/**
- * Module dependencies.
- */
-
-var express = require('express'),
+var browserid = require('connect-browserid'),
+    clientSessions = require("client-sessions"),
+    express = require('express'),
     routes = require('./routes'),
-    browserid = require('connect-browserid'),
-    redis = require('redis'),
-    RedisStore = require('connect-redis')(express);
 
-var conf = require('./config'),
-    profiles = require('./lib/profiles'),
-    redis_client = redis.createClient();
+    conf = require('./config'),
+    profiles = require('./lib/profiles');
 
 var app = module.exports = express.createServer();
-redis_client.on('error', function (err) { console.error(err); });
 
 // Configuration
-
+app.configure('development', function(){
+  app.use(function (req, resp, next) {
+    if (req.url == '/favicon.ico') {
+      resp.send('wha', 404);
+    } else {
+      next();
+    }
+  });
+});
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
@@ -28,11 +28,14 @@ app.configure(function(){
   app.use(express.logger());
   app.use(express.responseTime());
   app.use(express.methodOverride());
-  app.use(express.cookieParser());
-  app.use(express.session({ secret: conf.session_sekrit,
-                            /*cookie: {maxAge: 1000 * 60 * 60 * 6},*/ // 6 Hours
-                            store: new RedisStore({client: redis_client}) }));
-
+  app.use(clientSessions({
+    cookieName: 'session_state',
+    secret: conf.session_sekrit,
+    duration: 6 * 24 * 60 * 60 * 1000, // 1 day
+    cookie: {
+      maxAge: 14 * 24 * 60 * 60 * 1000 // 2 weeks
+    }
+  }));
   app.use(browserid.authUser({ secret: conf.browserid_sekrit,
                                audience: conf.browserid_audience }));
   app.use(browserid.guarantee_audience);
@@ -55,6 +58,7 @@ app.dynamicHelpers({
   },
 });
 
+
 // Routes
 //     Static
 app.get('/', routes.index);
@@ -75,7 +79,9 @@ app.get('/reciept/:transaction_id', routes.reciept);
 
 // Auth
 app.post('/auth', browserid.auth({ next: '/register' }));
-
+browserid.events.on('login', function (verified_email, req, resp) {
+  console.log('logged in event, ', verified_email);
+});
 app.get('/logout', browserid.logout({ next: '/' }));
 
 // Startup

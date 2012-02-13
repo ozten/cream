@@ -1,4 +1,11 @@
+exports.db_name     = "wallet";
+exports.db_user     = "root";
+exports.db_password = "pass";
+
 exports.stripe_sekrit = 'From Stripe Panel';
 
 exports.session_length = 1000 * 60 * 60 * 6; // 6 hour session
 exports.session_sekrit = 'Hobo LaRue, the most famous of hobos.';
+
+exports.browserid_sekrit = "asdlkfkjsdf l3k4j2";
+exports.browserid_audience = "http://dev.wallet.cream.org:3001";

@@ -1,15 +1,31 @@
 {
-    "name": "cream-gtm"
-  , "version": "0.0.1"
-  , "private": true
-  , "dependencies": {
-      "connect-browserid": ""
-    , "connect-redis": ""
-    , "ejs": "0.6.1"
-    , "express": "2.5.2"
-    , "less": ">= 0.0.1"
-    , "mail": ""
-    , "node-uuid": ""
-    , "redis": ""
+  "name": "cream-gtm",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "client-sessions": "0.0.3",
+    "connect-browserid": "",
+    "connect-redis": "",
+    "ejs": "0.6.1",
+    "express": "2.5.2",
+    "less": ">= 0.0.1",
+    "mail": "",
+    "node-uuid": "",
+    "redis": ""
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "author": "ozten <shout@ozten.com> (http://ozten.com)",
+  "description": "Simplest way to pay and GET PAYED! Demo app",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ozten/cream.git"
+  },
+  "main": "app.js",
+  "scripts": {
+    "test": "nodeunit test"
   }
 }
