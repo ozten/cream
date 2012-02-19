@@ -10,6 +10,7 @@ var app = module.exports = express.createServer();
 
 // Configuration
 app.configure('development', function(){
+  app.use(browserid.guarantee_audience);
   app.use(function (req, resp, next) {
     if (req.url == '/favicon.ico') {
       resp.send('wha', 404);
@@ -18,6 +19,7 @@ app.configure('development', function(){
     }
   });
 });
+
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
@@ -38,7 +40,6 @@ app.configure(function(){
   }));
   app.use(browserid.authUser({ secret: conf.browserid_sekrit,
                                audience: conf.browserid_audience }));
-  app.use(browserid.guarantee_audience);
   app.use(routes.localVars);
   app.use(app.router);
 });

@@ -9,6 +9,10 @@ var browserid = require('connect-browserid'),
 
 var app = module.exports = express.createServer();
 
+app.configure('development', function(){
+  app.use(browserid.guarantee_audience);
+});
+
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
@@ -24,8 +28,9 @@ app.configure(function(){
 
   app.use(browserid.authUser({ secret: conf.browserid_sekrit,
                                audience: conf.browserid_audience }));
-  app.use(browserid.guarantee_audience);
   app.use(app.router);
+  app.use(express.compiler({ enable: ['less'],
+                             src: './public'}));
   app.use(express.static(__dirname + '/public'));
 });
 
