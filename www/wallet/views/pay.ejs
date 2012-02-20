@@ -1,42 +1,40 @@
-<h1>Pay</h1>
-<p>Amount: <b id="amount"></b></p>
-<p>Reason: <span id="description"></span></p>
-<p><strong id="reciever"></strong> accepts:
-  <ol id="payment-choices">
-    <!-- TODO base on accepted type -->
-    <% 
-       for (i in existing_methods) {
-         pay_meth = existing_methods[i];
-         if (pay_meth.type == 'IOU') {
-    %>
-      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>">I Owe You</label></li>
-    <% } else if (pay_meth.type.toUpperCase() == 'VISA') { %>
-      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type  %>_1" /> <label for="payment<%= i %>"><%= pay_meth.type  %></label></li>
-    <% } else { %>
-      <pre><code><%- util.inspect(pay_meth) %></code></pre>a
-    <% } %>
-  <% } %>
+<nav id='auth-feedback' class="<% if (!user) { %>hidden<% } %>"><span class="email-address"><% if (user) { %><%= user %><% } %></span> <a href="/logout">Lock Wallet</a></nav>
+<div id="invoice">
+  <h1>Please Pay</h1>
+  <p id="invoice-amount"><span class="label">Amount:</span> <b id="amount"></b></p>
+  <p id="invoice-description"><span class="label">Reason:</span> <span id="description"></span></p>
+</div><!-- invoice -->
 
-    <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] Add a Payment method</a></li>
-  </ol>
+<div id="login-form" class="<% if (user) { %>hidden<% } %>">
+  <form action="">
+    <button class="browserid">Unlock Wallet</button>
+  </form>
+</div>
+
+<div id="wallet" class="<% if (! user) { %>hidden<% } %>">
+
+<!-- BEGIN WALLET -->
+<p><strong id="reciever"></strong> accepts:
+  <!-- Ajax Refreshable -->
+  <div id="existing-payment">
+    <%- partial('existing_payment_methods') %>
+  </div>
 </p>
-<div id="login-form">
-  <% if (user) { %>
-    <p>Logged in as <span class="email-address"><%= user %></span></p>
-  <% } else { %>
-    <form action="">
-      <p>DEMO Gawds... Sign in</p>
-      <button class="browserid">Sign in</button>
-    </form>
-  <% } %>
-</div>
-<div id="existing-payment">
-  <%- partial('existing_payment_methods') %>
-</div>
-_
-<button id="pay">Pay</button>
-_
+<!-- END WALLET -->
+
+
+
+  <button id="pay">Pay</button>
+</div><!-- #wallet -->
+
 <script>
+/* Un-comment to develop /pay directly 
+window.addEventListener('load', function () {
+  $('#amount').text('$12.00');
+  $('#description').text('Toothbrushes');
+});
+*/
+
 /* Un-comment to Automate for develping second step of wizard
 window.addEventListener('load', function () {
   $('#add-payment-method-button').click();

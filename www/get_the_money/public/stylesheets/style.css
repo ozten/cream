@@ -42,3 +42,6 @@ div.foo div.bar p.buzz {
 footer {
   margin-top: 100px;
 }
+#make-payment .ui-input-text, #ask-for-payment .ui-input-text {
+  width: auto;
+}

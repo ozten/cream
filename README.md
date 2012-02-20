@@ -87,7 +87,3 @@ $10 from Alice.
   * MySQL
   * node 0.6.6
   * ozten/connect-browserid
-
-## TODO ##
-
-* Get the Money Recent screen

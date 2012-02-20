@@ -1,12 +1,16 @@
 <h2>Request Cash</h2>
-<form method="POST">
-  <div>
+<form id="ask-for-payment" method="POST">
+  <div data-role="fieldcontain">
     <label for='email'>Ask</label>
-    <input type="email" id="email" name="email" value="" /> 
+    <input type="email" id="email" name="email" value="" /> (email address)
   </div>
-  <div>
-    <label for="dollaramount">for</label>
+  <div data-role="fieldcontain">
+    <label for="dollaramount">for the amount of </label>
     $ <input type="number" id="dollaramount" name="dollaramount" value="" size="3" />.<input type="number" id="centamount" name="centamount" value="00" size="2" />
+  </div>
+  <div data-role="fieldcontain">
+    <label for="description">Optional Reason:</label>
+    <textarea id="description" name="description"></textarea>
   </div>
   <div>
     <button data-ajax="false">Email Now</button>

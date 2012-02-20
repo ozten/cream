@@ -2,4 +2,5 @@ exports.session_sekrit = "replace me";
 
 exports.browserid_sekrit = "replace me";
 exports.browserid_audience = "http://dev.gtm.cream.org:3000";
+exports.system_email = 'billing@dev.gtm.cream.org';
 exports.wallet_host = "http://dev.wallet.cream.org:3001";

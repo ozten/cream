@@ -83,21 +83,38 @@ $(document).ready(function () {
       });
     });
 
+  /**
+   * Vendors accept X, Y Payments Methods
+   * Customers have Y, Z 
+   * Update Existing Payment Area to help user choose
+   */
+  var sortPayments = function () {
+
+  };
+
   $('.browserid').click(function (event) {
     event.preventDefault();
-    var opts = {
-      requiredEmail: user_email
-    };
+    var opts = {};
+    if (user_email) opts.requiredEmail = user_email;
+    $('button.browserid').attr('disabled', true);
     navigator.id.get(function (assertion) {
       if (assertion) {
         $.post("/auth", {assertion: assertion}, function(res) {
           if (res.status && res.status == "okay") {
+            window.email = res.email;
             $('.email-address').text(window.email);
-            $('#existing-payment').load('/existing-payment');
+            $('#existing-payment').load('/existing-payment', 
+                                        function () {
+              //TODO We need to know list of vendor supported
+              sortPayments();
+              $('#login-form').hide('slow');
+              $('#wallet, #auth-feedback').show('slow');
+
+            });
           }
         });
-           
       }
+      $('button.browserid').attr('disabled', null);
     }, opts);
   });
 

@@ -1,11 +1,17 @@
   <h2>Existing</h2>
-  <ol id="existing-payment-methods">
-    <% for (var i=0; i < existing_methods.length; i++) {
-         var method = existing_methods[i]; 
-         if (method.type == 'VISA') { %>
-           <li><%= method.type %> <%= method.display %> expires <%= method.expires %></li>
-      <% } else if (method.type == 'IOU') { %>
-           <li><%= method.type %></li>
-      <% } %>           
+  <ol id="payment-choices">
+    <!-- TODO base on accepted type -->    
+    <% 
+       for (i in existing_methods) {
+         pay_meth = existing_methods[i];
+         if (pay_meth.type == 'IOU') {
+    %>
+      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>">I Owe You</label></li>
+    <% } else if (pay_meth.type.toUpperCase() == 'VISA') { %>
+      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type  %>_1" /> <label for="payment<%= i %>"><%= pay_meth.type  %></label></li>
+    <% } else { %>
+      <pre><code><%- util.inspect(pay_meth) %></code></pre>
     <% } %>
+  <% } %>
+    <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] Add a Payment method</a></li>
   </ol>

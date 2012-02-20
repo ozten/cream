@@ -1,4 +1,3 @@
-// Secret Key... shhhh
 var config = require('../config');
 
 var fs = require('fs'),
@@ -75,6 +74,11 @@ var existing_pay_methods = function (email, cb) {
   });//withDb
 };
 
+/**
+ * Support to main use cases:
+ * 1) Anonymous user, login to unlock wallet
+ * 2) Authenticated user, wallet is already unlocked
+ */
 exports.pay = function(req, res){
   if (req.user) {
     pay_meths = existing_pay_methods(req.user, function (err, pay_meths) {
@@ -200,7 +204,6 @@ exports.pay_transaction = function (req, resp) {
         } else {
           var pay_info = util.format("%s %d", charge.card.type, charge.card.last4);
           console.log('charge info', charge);
-          // TODO - purchase dashboard?
           var data = {
             date: new Date(charge.created),
             amount: charge.amount,

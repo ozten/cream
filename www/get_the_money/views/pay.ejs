@@ -2,11 +2,13 @@
 <p><%= requestorEmail %> has requested <%= display_amount %>.</p>
 <form id="make-payment" method="POST">
 
-  <div>
-    <label for="amount">Amount</label>
-    <input type="number" id="amount" name="amount" value="<%= amount %>" />
+  <div data-role="fieldcontain">
+    <label for="amount-dollar">Amount:</label>
+    <input type="hidden" id="amount" name="amount" value="<%= amount %>" />
+    $<input type="number" id="amount-dollar" name="amount-dollar" value="<%= Math.floor(amount / 100)%>" size="3" />
+    .<input type="number" id="amount-cents" name="amount-cents" value="<%= amount % 100 %>" size="2" />
   </div>
-  <div>
+  <div data-role="fieldcontain">
     <label for="requestorEmail">Pay to</label>
     <input type="text" name="requestorEmail" value="<%= requestorEmail %>" />
   </div>

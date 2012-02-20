@@ -1,7 +1,10 @@
 $('#make-payment').submit(function(event) {
   event.preventDefault();
   //var amount = parseFloat($('#make-payment #amount').val()) * 100;
-  var amount = parseFloat($('#amount', $(this)).val());
+  // amount 1000 is $10.00
+  var amount = parseInt($('#amount-dollar', $(this)).val()) * 100 +
+               parseInt($('#amount-cents', $(this)).val());
+  alert('Charging ' + amount);
   var process_reciept = function (reciept) {
     console.log(reciept);
     var f = $('#make-reciept');

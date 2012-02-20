@@ -96,7 +96,8 @@ exports.ask_for_cash = function(req, res){
                                          qs.escape(email), qs.escape(payReq.id));
           console.log(message_body);
           mail.message({
-            from: senders_email,
+            from: conf.system_email,
+            'reply-to': senders_email,
             to: [email],
             cc: [senders_email],
             subject: util.format('%s has asked you for some cream', req.user)
