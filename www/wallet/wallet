@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var browserid = require('connect-browserid'),
     clientSessions = require("client-sessions"),
     express = require('express'),

@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "client-sessions": "0.0.3",
-    "connect-browserid": "",
+    "connect-browserid": "git://github.com/ozten/connect-browserid.git",
     "connect-redis": "",
     "express": "2.5.2",
     "ejs": "0.6.1",
@@ -23,7 +23,7 @@
     "type": "git",
     "url": "git://github.com/ozten/cream.git"
   },
-  "main": "app.js",
+  "main": "wallet",
   "scripts": {
     "test": "nodeunit test"
   }
