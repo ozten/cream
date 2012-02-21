@@ -22,7 +22,11 @@ $(document).ready(function () {
       $('#amount').text('$' + args.amount / 100);
       $('#reciever').text(args.reciever);
       // accepted-types, payee, 
-      console.log(args);
+      for (var i=0; i < args.accepted_types.length; i++){
+        var t = args.accepted_types[i];
+        var li = '<li class="pay-type-' + t.toLowerCase() + '" title="' + t + '"></li>';
+        $('#accepted-payment').append(li);
+      }
       $('#description').text(args.description);
       window.a = args;
       console.log(args);

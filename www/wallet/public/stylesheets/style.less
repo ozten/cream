@@ -30,9 +30,47 @@ header {
 #content {
   clear: both;
 
+  #invoice-amount { float: left; }
+  #invoice-description { clear: left; margin: auto; }
+
+  .label {
+    margin: auto;
+  }
+
+  li.pay-type-visa, label.pay-type-visa {
+    background: url(/images/visa_42x30.png) no-repeat;
+  }
+  li.pay-type-iou, label.pay-type-iou {
+    background: url(/images/iou_42x30.png) no-repeat;
+  }
+
+
+  #accept {
+    float: left;
+    width: 35%;
+  }
   #existing-payment {
     float: left;
-    width: 30%;
+    width: 60%;
+    margin-top: -80px;
+  }
+  #accepted-payment {
+    //float: left;
+    padding-left: 0px;
+    li {
+      float: left;
+      list-style: none;
+      margin-right: 5px;
+      padding-left: 42px;
+      min-height: 42px;
+      vertical-align: bottom;
+    }
+  }
+  br.clear { clear: both; }
+  #existing-payment {
+
+
+    width: 45%;
 
     h2 {
       margin-top: 0px;
@@ -42,9 +80,19 @@ header {
  
       li {
         list-style: none;
+        min-height: 42px;
+        vertical-align: bottom;        
       }
     }
+    label {
+      list-style: none;
+      margin-right: 5px;
+      padding-left: 50px;
+      min-height: 42px;
+    }
   }
+
+  #pay { clear: both; }
 
   #add-payment {
     margin-left: 30%;

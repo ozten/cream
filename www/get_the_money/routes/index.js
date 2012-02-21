@@ -92,8 +92,10 @@ exports.ask_for_cash = function(req, res){
           //profile['fullName']
           var message_body = util.format('%s has asked you for %s.\n' +
                 'You can pay them by visiting:\n' + conf.browserid_audience +
-                '/pay/%s/%s\n', req.user, amount,
+                '/pay/%s/%s\n', req.user, format_money(amount),
                                          qs.escape(email), qs.escape(payReq.id));
+                                      
+          console.log('from: ', conf.system_email);
           console.log(message_body);
           mail.message({
             from: conf.system_email,

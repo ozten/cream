@@ -13,18 +13,23 @@
 
 <div id="wallet" class="<% if (! user) { %>hidden<% } %>">
 
-<!-- BEGIN WALLET -->
-<p><strong id="reciever"></strong> accepts:
+  <!-- BEGIN WALLET -->
+  <div id="accept">
+    <div class="label"><strong id="reciever"></strong> accepts:</div>
+    <ol id="accepted-payment">
+    </ol>
+    <br class="clear" />
+  </div>
   <!-- Ajax Refreshable -->
   <div id="existing-payment">
     <%- partial('existing_payment_methods') %>
   </div>
-</p>
+
 <!-- END WALLET -->
 
-
-
-  <button id="pay">Pay</button>
+  <div>
+   <button id="pay">Pay</button>
+  </div>
 </div><!-- #wallet -->
 
 <script>

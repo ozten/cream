@@ -1,4 +1,4 @@
-  <h2>Existing</h2>
+  <h2>Existing Payment Methods</h2>
   <ol id="payment-choices">
     <!-- TODO base on accepted type -->    
     <% 
@@ -6,12 +6,12 @@
          pay_meth = existing_methods[i];
          if (pay_meth.type == 'IOU') {
     %>
-      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>">I Owe You</label></li>
+      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>" class="pay-type-<%= pay_meth.type.toLowerCase() %>">I Owe You</label></li>
     <% } else if (pay_meth.type.toUpperCase() == 'VISA') { %>
-      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type  %>_1" /> <label for="payment<%= i %>"><%= pay_meth.type  %></label></li>
+      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type  %>_1" /> <label for="payment<%= i %>" class="pay-type-<%= pay_meth.type.toLowerCase() %>"><%= pay_meth.display  %></label></li>
     <% } else { %>
       <pre><code><%- util.inspect(pay_meth) %></code></pre>
     <% } %>
   <% } %>
-    <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] Add a Payment method</a></li>
+    <li><a id="add-payment-method-button" href="/add-payment-method" data-role="button">[+] New Payment method</a></li>
   </ol>

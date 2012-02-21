@@ -4,7 +4,6 @@ $('#make-payment').submit(function(event) {
   // amount 1000 is $10.00
   var amount = parseInt($('#amount-dollar', $(this)).val()) * 100 +
                parseInt($('#amount-cents', $(this)).val());
-  alert('Charging ' + amount);
   var process_reciept = function (reciept) {
     console.log(reciept);
     var f = $('#make-reciept');
@@ -17,7 +16,7 @@ $('#make-payment').submit(function(event) {
     console.log('submitting');
     f.submit();
   };
-  navigator.payz(amount, ['VISA'],
+  navigator.payz(amount, ['VISA', 'IOU'],
                  // Which side has recipient
                  {
                    reciever: 'shout@ozten.com',

@@ -54,10 +54,11 @@ var existing_pay_methods = function (email, cb) {
           var cc = customer.active_card;
           console.log(cc);
           if (cc) {
-              console.log('pushing');
+              console.log('pushing', cc);
             pay_meths.push({
               type: cc.type,
-              display: util.format('Ends in %s', cc.last4),
+              display: util.format('Ends in %s expires %d/%d', 
+                                   cc.last4, cc.exp_month, cc.exp_year),
               expires: util.format('%d/%d', cc.exp_month, cc.exp_year)
            });
          }
@@ -171,9 +172,7 @@ exports.stripe_add_payment = function (req, resp) {
 };
 
 exports.pay_transaction = function (req, resp) {
-  // Demo GAWDs
-  // Payer
-  req.user = 'eozten@yahoo.com';
+  if (browserid.enforceLogIn(req, resp)) return;
   db.withDb(function (err, conn, _db) {
     userdb.get_user(conn, req.user, function (err, user) {
       if (! user.customer_id) throw "Error, no stripe customer info";
