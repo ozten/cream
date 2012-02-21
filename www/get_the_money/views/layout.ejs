@@ -15,8 +15,8 @@
           <% if (authenticated) { %>
             <li><a data-role="button" href="/ask-for-cash">Ask for Cash</a></li>
             <li><a data-role="button" href="/recent">Recent Activity</a></li>
-            <li id="user-nav"><img src="<%= gravatar %>" /><%= user %> </li>
-            <li><a data-role="button" href="/logout">Log out</a></li>
+
+
           <% } else { %>
             <li><a data-role="button" href="/about">About</a></li>
             <li><button class="bid">Sign In</button></li>
@@ -27,7 +27,17 @@
     <div id="content" data-role="content">
       <%- body %>
     </div><!--  data-role=content -->
-    <footer data-role="footer">Dollar, dollar bill y'll</footer>
+    <footer data-role="footer">
+      <nav>
+        <ul>
+            <li>Dollar, dollar bill y'll</li>
+      <% if (authenticated) { %>
+            <li id="user-nav"><img src="<%= gravatar %>" /><%= user %> </li>
+            <li><a data-role="button" href="/logout">Log out</a></li>
+      <% } %>
+        </ul>
+      </nav>
+    </footer>
     </div><!-- data-role=page -->
     <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script -->
     <script src="/javascripts/lib/jquery-1.7.1.min.js"></script>
