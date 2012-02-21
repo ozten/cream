@@ -2,24 +2,23 @@
 <h2>Income</h2>
 <% for (var i=0; i < income.length; i++) { 
      with (income[i]) { %>
-  <div>On <%= date %> <a href="mailto:<%= customer_email %>"><%= customer_email %></a> paid you <%= format_money(amount) %> for TODO description. 
+  <div>On <%= date %> <a href="mailto:<%= customer_email %>"><%= customer_email %></a> paid you <%= format_money(amount) %>. 
     Transaction# <a id="<%= transaction_id %>" href="/reciept/<%= transaction_id %>"><%= transaction_id %></a></div>
 <%   } 
    } %>
 <h2>Requested</h2>
 <% for (var i=0; i < requested.length; i++) { 
      with (requested[i]) { %>
-  <div><a id="<%= id %>" href="mailto:<%= requestorEmail %>"><%= requestorEmail %></a> requested <%= format_money(amount) %> from you. 
+  <div><a id="<%= id %>" href="mailto:<%= requestorEmail %>"><%= requestorEmail %></a> requested <%= format_money(amount) %> from you.</div>
 
-<a href="/pay/<%= user %>/<%= id %>">Pay Now</a>
-
-TODO When?</div>
+<div><a href="/pay/<%= user %>/<%= id %>">Pay Now</a></div>
+<br />
 <%   }
    } %>
 <h2>Requests</h2>
 <% for (var i=0; i < requests.length; i++) { 
      with (requests[i]) { %>
-  <div>You requested <%= format_money(amount) %> from <a id="<%= id %>" href="mailto:<%= requesteeEmail %>"><%= requesteeEmail %></a> TODO When?</div>
+  <div>You requested <%= format_money(amount) %> from <a id="<%= id %>" href="mailto:<%= requesteeEmail %>"><%= requesteeEmail %></a></div>
 <%   }
    } %>
 <h2>Reciepts</h2>
