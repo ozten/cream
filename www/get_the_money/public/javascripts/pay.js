@@ -1,4 +1,4 @@
-$('#make-payment').submit(function(event) {
+$('#make-payment').live('submit', function(event) {
   event.preventDefault();
   //var amount = parseFloat($('#make-payment #amount').val()) * 100;
   // amount 1000 is $10.00
