@@ -6,7 +6,7 @@ var crypto = require('crypto'),
     qs = require('querystring'),
     util = require('util'),
 
-    conf = require('../config'),
+    conf = require('../etc/config'),
     profiles = require('../lib/profiles'),
     browserid = require('connect-browserid'),
     format_money = require('../lib/money_util').format_money,
@@ -21,12 +21,7 @@ var crypto = require('crypto'),
  */
 
 exports.index = function(req, res){
-  console.log('pre rand', req.session);
-  req.session.rand = Math.random();
-  console.log(util.inspect(req.session));
-  console.log('new rand', req.session);
   res.render('index', {});
-  //res.send('hi');
 };
 
 exports.register = function (req, res) {
@@ -63,7 +58,7 @@ exports.recent = function(req, res) {
       //res.redirect('/register');
     //}
   //});
-}
+};
 
 exports.direct = function (template) {
   return function(req, res){
@@ -82,27 +77,22 @@ exports.ask_for_cash = function(req, res){
         var email = req.body.email,
             senders_email = req.user,
             amount = parseInt(req.body.dollaramount, 10) * 100 + parseInt(req.body.centamount, 10);
-        console.log('POST body', req.body);
-        console.log('POST ask_for_cash', amount);
         payments.paymentRequested(senders_email, email, 
                                   amount, function (err, payReq) {
-        console.log('paymentRequested callback');
-          if (err) throw err;
-        console.log('format message');
+        if (err) throw err;
           //profile['fullName']
-          var message_body = util.format('%s has asked you for %s.\n' +
+          var message_body = util.format('%s has asked you for %s.\n\n' +
                 'You can pay them by visiting:\n' + conf.browserid_audience +
                 '/pay/%s/%s\n', req.user, format_money(amount),
                                          qs.escape(email), qs.escape(payReq.id));
                                       
-          console.log('from: ', conf.system_email);
-          console.log(message_body);
+          console.info(message_body);
           mail.message({
             from: conf.system_email,
             'reply-to': senders_email,
             to: [email],
             cc: [senders_email],
-            subject: util.format('%s has asked you for some cream', req.user)
+            subject: util.format('%s has asked you for %s', req.user, format_money(amount))
           })
           .body(message_body)
 
@@ -132,30 +122,24 @@ exports.pay = function(req, res){
   // 1) no auth - capture details to session and redirect
   // 2) fresh auth - check session and continue
   // 3) auth - use request params and continue
-
+  var pay_req_id, email;
   if (! req.user) {
-      console.log("copying", req.params);
       var pay_info = { email: req.params.email,
                        pay_req_id: req.params.pay_req_id};
       req.session.pay_info = pay_info;
-      console.log(req.session);
       res.render('pay_login');
 
       return;
   } else if (req.session.pay_info){   
-    var email      = req.session.pay_info.email,
-        pay_req_id = req.session.pay_info.pay_req_id;
-    console.log('back', req.session);
+    pay_req_id = req.session.pay_info.pay_req_id;
   } else {
-    var email = req.params.email,
-        pay_req_id = req.params.pay_req_id;
-        console.log('no payinfo back', req.session);
+    pay_req_id = req.params.pay_req_id;
   }
+  email = req.session.user;
   console.log('email=%s id=%s', email, pay_req_id);
   payments.paymentRequest(pay_req_id, function (err, pay_req) {
-    console.log(pay_req);
     //requesteeEmail: requesteeEmail,
-    res.render('pay', { requestorEmail: pay_req['requestorEmail'], 
+    res.render('pay', { requestorEmail: pay_req.requestorEmail, 
                         display_amount: format_money(pay_req.amount),
                         amount: pay_req.amount });
   });
@@ -164,23 +148,21 @@ exports.pay = function(req, res){
 exports.create_reciept = function (req, resp) {
   //req.user = 'eozten@yahoo.com';
   if (browserid.enforceLogIn(req, resp)) return;
-  var tx_id = req.body['transaction_id'];
+  var tx_id = req.body.transaction_id,
       reciept = {
-        amount: req.body['actual_amount'],
-        currency: req.body['currency'],
-        date: req.body['date'],
+        amount: req.body.actual_amount,
+        currency: req.body.currency,
+        date: req.body.date,
         customer_email: req.user,
-        merchant_email: req.body['merchant_email'],
-        payment_type: req.body['payment_type'],
+        merchant_email: req.body.merchant_email,
+        payment_type: req.body.payment_type,
         transaction_id: tx_id
       },
       url = util.format('/reciept/%s', tx_id);
-  console.log("creating ", reciept);
   payments.recordReciept(reciept, function (err, pay_req) {
     if (err) {
       resp.send(err, 500);
     } else {
-      console.log("redirecting ", url);
       resp.redirect(url);
     }
   });
@@ -200,7 +182,7 @@ exports.reciept = function (req, resp) {
 // Middleware
 exports.localVars = function (req, res, next) {
   var vars = {
-    title: 'C.R.E.A.M, Get the Money',
+    title: 'Get the Money',
     authenticated: false,
     cream_host: conf.wallet_host
   };

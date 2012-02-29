@@ -2,7 +2,7 @@
 <h2>Income</h2>
 <% for (var i=0; i < income.length; i++) { 
      with (income[i]) { %>
-  <div>On <%= date %> <a href="mailto:<%= customer_email %>"><%= customer_email %></a> paid you <%= format_money(amount) %>. 
+  <div>On <%= date %> <strong><a href="mailto:<%= customer_email %>"><%= customer_email %></a></strong> paid you <%= format_money(amount) %>. 
     Transaction# <a id="<%= transaction_id %>" href="/reciept/<%= transaction_id %>"><%= transaction_id %></a></div>
 <%   } 
    } %>

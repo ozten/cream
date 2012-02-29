@@ -3,10 +3,13 @@
 var browserid = require('connect-browserid'),
     clientSessions = require("client-sessions"),
     express = require('express'),
-    routes = require('./routes'),
+    path = require('path'),
+    routes = require('../routes'),
 
-    conf = require('./config'),
-    profiles = require('./lib/profiles');
+    conf = require('../etc/config'),
+    profiles = require('../lib/profiles');
+
+process.chdir(path.dirname(__dirname));
 
 var app = module.exports = express.createServer();
 
@@ -23,11 +26,11 @@ app.configure('development', function(){
 });
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
+  app.set('views', path.join(__dirname, '..', 'views'));
   app.set('view engine', 'ejs');
   app.use(express.compiler({ enable: ['less'],
-                             src: './public'}));
-  app.use(express.static(__dirname + '/public'));
+                             src: './client'}));
+  app.use(express.static(path.join(__dirname, '..', 'client')));
   app.use(express.bodyParser());
   app.use(express.logger());
   app.use(express.responseTime());
@@ -81,11 +84,11 @@ app.post('/reciept', routes.create_reciept);
 app.get('/reciept/:transaction_id', routes.reciept);
 
 // Auth
-app.post('/auth', browserid.auth({ next: '/register' }));
+app.post('/auth', browserid.auth());
 browserid.events.on('login', function (verified_email, req, resp) {
   console.log('logged in event, ', verified_email);
 });
-app.get('/logout', browserid.logout({ next: '/' }));
+app.post('/logout', browserid.logout());
 
 // Startup
 app.listen(3000);

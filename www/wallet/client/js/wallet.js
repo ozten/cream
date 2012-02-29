@@ -1,37 +1,27 @@
 $(document).ready(function () {
-    var doit;
+    var add_pay_meth_chooser;
     var user_email;
-    console.info('Setting up WinChan onOpen');
+    var state = { args: {} };
     WinChan.onOpen(function(origin, args, cb) {
       console.info('onOpen just got real', args);
       // origin is the scheme+host+port that cause window invocation,
       // it can be trusted
 
       // args are the untrusted arguments provided by the calling site
-
+      for (var key in args) {
+        if ('accepted_tyes' === key) {
+          state.args[key] = args[key].slice();
+        } else {
+          state.args[key] = args[key];
+        }
+      }
       // and cb you can call within the function, or synchronously later.
       // calling it indicated the window is done and can be closed.
-      console.info('origin=' + origin);
-      console.info(args);
-      // TODO /pay should load a shell of a page... 
-      // If user is already logged into wallet, then HTML will show their
-      // Payment methods
-      // If not, then a requiredEmail will be used which is the same as their
-      // args.payee
-      // After login, payment methods would be displayed
-      $('#amount').text('$' + args.amount / 100);
-      $('#reciever').text(args.reciever);
-      // accepted-types, payee, 
-      for (var i=0; i < args.accepted_types.length; i++){
-        var t = args.accepted_types[i];
-        var li = '<li class="pay-type-' + t.toLowerCase() + '" title="' + t + '"></li>';
-        $('#accepted-payment').append(li);
-      }
-      $('#description').text(args.description);
-      window.a = args;
-      console.log(args);
-      user_email = args.payee;
-      doit = function () {
+
+      populatePay(args);
+
+      user_email = args.payee; // TODO state.user_email?
+      add_pay_meth_chooser = function () {
         var pt = $('[name=payment]:checked').val();
         $.ajax('/pay-transaction', {
           type: 'POST',
@@ -51,17 +41,17 @@ $(document).ready(function () {
           }
         });
       };
+    }); // WinChan.open
+
+    $('#pay').live('click', function () {
+      add_pay_meth_chooser();
     });
 
-    $('#pay').click(function () {
-      doit();
-    });
-
-    $('[data-role=button]').click( function (event) {
+    $('[data-role=button]').live('click',  function (event) {
       event.preventDefault();
       $('#content').load($(this).attr('href'), function () {
         $('.wizard2 > div').hide();
-        $('#chooser ul li a').click(function (event) {
+        $('#chooser ul li a').live('click', function (event) {
           event.preventDefault();
           var type = $(this).attr('href');
           window.payMethod = type;
@@ -69,15 +59,25 @@ $(document).ready(function () {
           $('#chooser-' + type).show();
           $('#chooser-nav').show();
         });
+        console.log('outisde', state);
+        $('#chooser .cancel').live('click', function (event) {
+          event.preventDefault();
+          $('#add-payment').remove();
+        console.log('inside', state);     
+          $('#content').load('/pay', function () {
+             console.log('callback', state);     
+             populatePay(state.args);
+          });
+        });
 
-        $('#chooser-nav .cancel').click(function (event) {
+        $('#chooser-nav .cancel').live('click', function (event) {
           event.preventDefault();
           window.payMethod = null;
           $('.wizard2 > div').hide();
           $('#chooser').show();
         });
 
-        $('#chooser-nav .continue').click(function (event) {
+        $('#chooser-nav .continue').live('click', function (event) {
           event.preventDefault();
 
           if (window.payMethod == 'VISA') {
@@ -86,6 +86,7 @@ $(document).ready(function () {
         });
       });
     });
+    
 
   /**
    * Vendors accept X, Y Payments Methods
@@ -96,7 +97,7 @@ $(document).ready(function () {
 
   };
 
-  $('.browserid').click(function (event) {
+  $('.browserid').live('click', function (event) {
     event.preventDefault();
     var opts = {};
     if (user_email) opts.requiredEmail = user_email;
@@ -122,6 +123,25 @@ $(document).ready(function () {
     }, opts);
   });
 
+  var populatePay = function (args) {
+      console.log('populatePay args=', args);
+      // If user is already logged into wallet, then HTML will show their
+      // Payment methods
+      // If not, then a requiredEmail will be used which is the same as their
+      // args.payee
+      // After login, payment methods would be displayed
+      $('#amount').text('$' + args.amount / 100);
+      $('#reciever').text(args.reciever);
+      // accepted-types, payee, 
+      for (var i=0; i < args.accepted_types.length; i++){
+        var t = args.accepted_types[i];
+        var li = '<li class="pay-type-' + t.toLowerCase() + '" title="' + t + '"></li>';
+        $('#accepted-payment').append(li);
+      }
+      $('#description').text(args.description);
+      window.a = args;
+      console.log(args);
+  };
 });
 
 function doStripe() {
@@ -135,8 +155,7 @@ function doStripe() {
         exp_month: $('#visa-expiration-month').val(),
         exp_year: $('#visa-expiration-year').val()
     }, amount, stripeResponseHandler);
-
-};
+}
 
 function stripeResponseHandler(status, response) {
     if (console) console.info(response);
@@ -145,7 +164,7 @@ function stripeResponseHandler(status, response) {
     } else {
         var form$ = $("#stripe-payment");
         // token contains id, last4, and card type
-        var token = response['id'];
+        var token = response.id;
         // insert the token into the form so it gets submitted to the server
         form$.append("<input type='hidden' name='stripeToken' value='" + token + "'/>");
         // and submit
@@ -153,4 +172,4 @@ function stripeResponseHandler(status, response) {
         $('#visa-cvv2').attr('name', null);
         form$.get(0).submit();
     }
-};
+}

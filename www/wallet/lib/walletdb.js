@@ -1,4 +1,4 @@
-var conf = require('../config');
+var conf = require('../etc/config');
 
 var stripe = require('stripe')(conf.stripe_sekrit);
 

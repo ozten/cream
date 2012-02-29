@@ -2,8 +2,8 @@ $('#make-payment').live('submit', function(event) {
   event.preventDefault();
   //var amount = parseFloat($('#make-payment #amount').val()) * 100;
   // amount 1000 is $10.00
-  var amount = parseInt($('#amount-dollar', $(this)).val()) * 100 +
-               parseInt($('#amount-cents', $(this)).val());
+  var amount = parseInt($('#amount-dollar', $(this)).val(), 10) * 100 +
+               parseInt($('#amount-cents', $(this)).val(), 10);
   var process_reciept = function (reciept) {
     console.log(reciept);
     var f = $('#make-reciept');

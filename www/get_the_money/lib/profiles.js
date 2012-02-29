@@ -43,8 +43,8 @@ exports.setProfile = function (profile, req, res, cb) {
         console.error('Trouble saving email to %s', profile_key);
         cb(err);
       } else {
-          console.info("Saving full name= %s", profile['fullName']);
-        client.hset(profile_key, 'Full Name', profile['fullName'], function (err, resp) {
+          console.info("Saving full name= %s", profile.fullName);
+        client.hset(profile_key, 'Full Name', profile.fullName, function (err, resp) {
           if (err) {
             console.error('Trouble saving full name to %s', profile_key);
             cb(err);

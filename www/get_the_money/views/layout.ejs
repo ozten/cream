@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"> 
     <title><%= title %></title>
-    <link rel="stylesheet" href="/javascripts/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.css" />    
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/js/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.css" />    
+    <link rel='stylesheet' href='/css/style.css' />
   </head>
   <body>
     <div data-role="page">
@@ -31,6 +31,7 @@
       <nav>
         <ul>
       <% if (authenticated) { %>
+            <li><a data-role="button" href="/about">About</a></li>
             <li id="user-nav"><img src="<%= gravatar %>" /><%= user %> </li>
             <li><a data-role="button" href="/logout">Log out</a></li>
       <% } %>
@@ -39,13 +40,13 @@
     </footer>
     </div><!-- data-role=page -->
     <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script -->
-    <script src="/javascripts/lib/jquery-1.7.1.min.js"></script>
+    <script src="/js/lib/jquery-1.7.1.min.js"></script>
     <script src="https://browserid.org/include.js"></script>
-    <script src="/javascripts/browserid.js"></script>
-    <script src="/javascripts/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.js"></script>
+    <script src="/js/browserid.js"></script>
+    <script src="/js/lib/jquery.mobile-1.0/jquery.mobile-1.0.min.js"></script>
 
     <!-- // TODO include.js should bring winchan, etc -->
-    <script src="<%= cream_host %>/javascripts/lib/winchan.js"></script>
+    <script src="<%= cream_host %>/js/lib/winchan.js"></script>
     <script src="<%= cream_host %>/include.js"></script>
 <script>
 
@@ -64,6 +65,7 @@ $('#winning').click(function (event) {
 });
 
 </script>
+<script src="/js/pay.js"></script>
   <% for (var i=0; i < page_scripts.length; i++) { %>
     <script src="<%= page_scripts[i] %>"></script>
   <% } %>

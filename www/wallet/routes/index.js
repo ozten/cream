@@ -1,9 +1,10 @@
-var config = require('../config');
+var config = require('../etc/config');
 
 var fs = require('fs'),
     path = require('path'),
     redis = require('redis').createClient(),
     stripe = require('stripe')(config.stripe_sekrit), // Currently tied to one merchant...
+    _ = require('underscore'),
     util = require('util');
 
 console.info('loading with seckrit key', config.stripe_sekrit);
@@ -26,7 +27,7 @@ exports.lift = function (req, resp) {
         path.resolve(
             path.join(
                 __dirname,
-                '../public/javascripts/include.js'));
+                '../client/js/include.js'));
   fs.readFile(raw_include, 
       function (err, data) {
           if (err) {
@@ -38,7 +39,7 @@ exports.lift = function (req, resp) {
 };
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Wallet' })
+  res.render('index', { title: 'Wallet' });
 };
 
 var existing_pay_methods = function (email, cb) {
@@ -81,16 +82,18 @@ var existing_pay_methods = function (email, cb) {
  * 2) Authenticated user, wallet is already unlocked
  */
 exports.pay = function(req, res){
+  var render = req.xhr ? _.bind(res.partial, res) : _.bind(res.render, res);
+  console.log(req.xhr, ' ', render);
   if (req.user) {
-    pay_meths = existing_pay_methods(req.user, function (err, pay_meths) {
-      res.render('pay', {
+    existing_pay_methods(req.user, function (err, pay_meths) {
+      render('pay', {
                  title: 'Wallet',
                  util: util,
                  existing_methods: pay_meths});
     });
 
   } else {
-    res.render('pay', {
+      render('pay', {
                  title: 'Wallet',
                  existing_methods: []});
   }
@@ -98,12 +101,11 @@ exports.pay = function(req, res){
 
 exports.existing_payment = function (req, resp) {
   if (browserid.enforceLogIn(req, resp)) return;
-  var pay_meths = existing_pay_methods(req.user, function (err, pay_meths){
+  existing_pay_methods(req.user, function (err, pay_meths){
     if (err) return resp.send(err, 500);
     return resp.partial('existing_payment_methods', 
                      {existing_methods: pay_meths});
-  });
-  
+  });  
 };
 
 exports.add_payment_method = function(req, res){
@@ -175,24 +177,22 @@ exports.pay_transaction = function (req, resp) {
   if (browserid.enforceLogIn(req, resp)) return;
   db.withDb(function (err, conn, _db) {
     userdb.get_user(conn, req.user, function (err, user) {
-      if (! user.customer_id) throw "Error, no stripe customer info";
+    if (! user.customer_id) throw "Error, no stripe customer info";
 
-    console.log('description=', req.body['description']);
-  
     var paydata = {
-      amount: req.body['amount'],
+      amount: req.body.amount,
       currency: 'usd',
       customer: user.customer_id,
-      description: req.body['description']
+      description: req.body.description
     };
-  console.log(req.body['payment_type']);
-  if (req.body['payment_type'].toUpperCase() != 'VISA_1') {
+  console.log(req.body.payment_type);
+  if (req.body.payment_type.toUpperCase() != 'VISA_1') {
     throw "TODO: right now this is stripe active card only";
   }
   console.log(req.user);
-  console.log(req.body['amount']);
+  console.log(req.body.amount);
 
-  console.log(req.body['description']);
+  console.log(req.body.description);
   // Payee - Currently shout@ozten.com  stripe account...
 /* TODO merchant email -> stripe account */
   stripe.charges.create(paydata,

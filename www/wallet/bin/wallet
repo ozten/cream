@@ -3,11 +3,14 @@
 var browserid = require('connect-browserid'),
     clientSessions = require("client-sessions"),
     express = require('express'),
+    path = require('path'),
 
-    db = require('./lib/db'),
-    conf = require('./config'),
-    routes = require('./routes'),
-    userdb = require('./lib/userdb');
+    db = require('../lib/db'),
+    conf = require('../etc/config'),
+    routes = require('../routes'),
+    userdb = require('../lib/userdb');
+
+process.chdir(path.dirname(__dirname));
 
 var app = module.exports = express.createServer();
 
@@ -16,7 +19,7 @@ app.configure('development', function(){
 });
 
 app.configure(function(){
-  app.set('views', __dirname + '/views');
+  app.set('views', path.join(__dirname, '..', 'views'));
   app.set('view engine', 'ejs');
   app.use(express.bodyParser());
   app.use(express.logger());
@@ -32,8 +35,8 @@ app.configure(function(){
                                audience: conf.browserid_audience }));
   app.use(app.router);
   app.use(express.compiler({ enable: ['less'],
-                             src: './public'}));
-  app.use(express.static(__dirname + '/public'));
+                             src: './client'}));
+  app.use(express.static(path.join(__dirname, '..', 'client')));
 });
 
 app.configure('development', function(){

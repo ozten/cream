@@ -46,6 +46,7 @@ exports.recent = function (email, cb) {
     }, 
     function (err, len) {
       redis.print(err, len);
+      if (len == 0) cb(munge(email, []));
       var counter = len; // When are we done?
       for (var i=0; i<len; i++) {
         (function (index) {
@@ -62,7 +63,7 @@ exports.recent = function (email, cb) {
                 res.push(obj);
                 counter--;
                 console.log('counter=', counter);
-                if (counter == 0) {
+                if (counter === 0) {
                   console.log('carry on');
                   console.log('ALL DONE', res); 
                   cb(munge(email, res));

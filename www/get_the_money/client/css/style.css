@@ -20,7 +20,7 @@
   clear: both;
 }
 #content .home-blurb {
-  min-height: 400px;
+  min-height: 100px;
   padding-top: 200px;
 }
 body {

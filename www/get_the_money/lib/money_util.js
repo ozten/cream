@@ -12,7 +12,7 @@ exports.format_money = function (amount) {
   if (amount % 100 < 10) {
     cents = '0' + (amount % 100);
   } else {
-    cents = new String(amount % 100);
+    cents = String(amount % 100);
   }
   return format("%s$%d.%s", sign, dollars, cents);
 };
