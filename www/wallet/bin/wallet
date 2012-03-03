@@ -4,6 +4,7 @@ var browserid = require('connect-browserid'),
     clientSessions = require("client-sessions"),
     express = require('express'),
     path = require('path'),
+    twitter = require('ntwitter')
 
     db = require('../lib/db'),
     conf = require('../etc/config'),
@@ -69,6 +70,26 @@ browserid.events.on('login', function (verified_email, req, resp) {
     });
   });
 });
+
+app.get('/merchant', routes.merchant);
+app.get('/merchant/add-payment/:method', routes.merchant_add_payment);
+app.post('/merchant/add-payment/:method', routes.merchant_add_payment);
+app.get('/merchant/start_twitter_oauth', routes.merchant_start_oauth);
+app.get('/merchant/tweet', routes.merchant_tweet);
+app.get('/merchant/twitter_login', routes.merchant_twitter_login);
+var twit = new twitter({
+      consumer_key: conf.twitter_consumer_key,
+      consumer_secret: conf.twitter_consumer_serkrit
+    });
+app.use(twit.login('/twitter_oauth', function (err, success, a, b) {
+  console.log("Successful twiter login!");
+  console.error(err);
+  console.log(success, a, b);
+}));
+
+
+app.get('/twitter_oauth', routes.merchant_oauth);
+
 app.get('/logout', browserid.logout({next:'/'}));
 
 // AJAX partial

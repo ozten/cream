@@ -1,1 +1,12 @@
-<p>Your Wallet</p>
+<% if (user) { %>
+<h1>Your Wallet</h1>
+
+<a href="#">Payment Methods</a>
+
+<a href="/merchant">Recieve Money</a>
+
+<%  } else { %>
+  <form action="">
+    <button class="browserid">Unlock Wallet</button>
+  </form>
+<% } %>

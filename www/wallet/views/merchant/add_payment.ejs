@@ -1,0 +1,10 @@
+<h2>PunkMoney</h2>
+<%= method %>
+<p>PunkMoney requires a Twitter Account. Payments are created, transferred, and redeemed via public Twitter status updates.<p>
+
+<% if (enabled) { %>
+  <h3>Account Enabled</h3>
+  <p>will receive PunkMoney payments.</p>
+<% } else { %>
+  <p><a href="/merchant/start_twitter_oauth">Authorize C.R.E.A.M to use Twitter</a></p>
+<% } %>

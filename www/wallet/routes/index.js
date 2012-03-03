@@ -7,10 +7,9 @@ var fs = require('fs'),
     _ = require('underscore'),
     util = require('util');
 
-console.info('loading with seckrit key', config.stripe_sekrit);
-
 var browserid = require('connect-browserid'),
     db = require('../lib/db'),
+    merchant = require('./merchant_routes'),
     userdb = require('../lib/userdb'),
     walletdb = require('../lib/walletdb');
 
@@ -18,6 +17,11 @@ redis.on('error', function (err) {
   // We handle redis errors at the top level
 });
 
+console.log(merchant);
+for (var k in merchant) {
+  exports[k] = merchant[k];
+}
+console.log(exports);
 /*
  * GET home page.
  */
@@ -38,9 +42,12 @@ exports.lift = function (req, resp) {
       });
 };
 
-exports.index = function(req, res){
-  res.render('index', { title: 'Wallet' });
+exports.index = function(req, resp){
+  resp.render('index', { 
+    title: 'Wallet',
+    layout: 'site_layout' });  
 };
+
 
 var existing_pay_methods = function (email, cb) {
   var pay_meths = [];

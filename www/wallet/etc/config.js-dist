@@ -1,3 +1,4 @@
+/* Wallet Config */
 exports.db_name     = "wallet";
 exports.db_user     = "root";
 exports.db_password = "pass";
@@ -9,3 +10,7 @@ exports.session_sekrit = 'Hobo LaRue, the most famous of hobos.';
 
 exports.browserid_sekrit = "asdlkfkjsdf l3k4j2";
 exports.browserid_audience = "http://dev.wallet.cream.org:3001";
+
+exports.twitter_consumer_key = "From Twitter App";
+exports.twitter_consumer_serkrit_ = "From Twitter App";
+exports.twitter_oauth_callback = "http://dev.wallet.cream.org:3001/twitter_oauth";
