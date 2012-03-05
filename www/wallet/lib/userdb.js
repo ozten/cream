@@ -12,6 +12,7 @@ exports.create_stripe_customer = function (conn, email, customer_id, cb) {
     if (cb) {
         cb(err, rows);
     } else if (err) {
+      console.log(ins_customer, email, customer_id);
       console.log('create_stripe_customer error', err);
     }
   });

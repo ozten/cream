@@ -8,6 +8,7 @@
     "connect-redis": "1.2.0",
     "express": "2.5.2",
     "ejs": "0.6.1",
+    "less": "1.2.2",
     "mysql": "0.9.5",
     "oauth": "0.9.6",
     "redis": "0.7.1",

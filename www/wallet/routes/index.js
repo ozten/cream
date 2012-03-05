@@ -10,6 +10,8 @@ var fs = require('fs'),
 var browserid = require('connect-browserid'),
     db = require('../lib/db'),
     merchant = require('./merchant_routes'),
+    punkmoney = require('../lib/punkmoney'),
+    stripe_pay = require('../lib/stripe_pay'),
     userdb = require('../lib/userdb'),
     walletdb = require('../lib/walletdb');
 
@@ -50,7 +52,27 @@ exports.index = function(req, resp){
 
 
 var existing_pay_methods = function (email, cb) {
-  var pay_meths = [];
+  var pay_meths = [],
+      counter = 2;
+  pay_meths.push({
+    type: 'IOU'
+  });
+  punkmoney.get_account(email, function (err, user) {
+    
+    if (err) {
+      console.log('no user is okay, trying anyways', err); 
+    } else {
+      pay_meths.push({
+        type: 'PunkMoney',
+        punk: user
+      });
+    }
+    counter--;
+    if (counter == 0) {
+        cb(null, pay_meths);
+    }
+    
+  });
   db.withDb(function (err, conn, db) {
     if (err) { console.error(err); return cb(err, []); }
     userdb.get_user(conn, email, function (err, user) {    
@@ -59,6 +81,7 @@ var existing_pay_methods = function (email, cb) {
         console.log('going to stripe for method ', user.customer_id);
         walletdb.get_stripe_methods(user.customer_id, function (err, customer) {
           if (err) { console.error(err); return cb(err, []); }
+          
           var cc = customer.active_card;
           console.log(cc);
           if (cc) {
@@ -70,14 +93,19 @@ var existing_pay_methods = function (email, cb) {
               expires: util.format('%d/%d', cc.exp_month, cc.exp_year)
            });
          }
-          pay_meths.push({
-            type: 'IOU'
-          });
+          
           console.log('loaded ', pay_meths);
-          cb(null, pay_meths);
+          counter--;
+          if (counter == 0) {
+            cb(null, pay_meths);  
+          }
+          
         });
       } else {
-        cb(null, []);
+        counter--;
+        if (counter == 0) {
+          cb(null, pay_meths);
+        }
       }
     });
   });//withDb
@@ -106,6 +134,27 @@ exports.pay = function(req, res){
   }
 };
 
+exports.add_punk_money_method = function (req, resp) {
+  if (browserid.enforceLogIn(req, resp)) return;
+  console.log('add-punk-money-method');
+  punkmoney.new_token(req, resp, '/add-punk-money-finish');
+};
+
+exports.add_punk_money_finish = function (req, resp) {
+  if (browserid.enforceLogIn(req, resp)) return;
+  console.log('finish-add-punk-money-method');
+  punkmoney.get_account(req.user, function (err, user) {
+    if (err) {
+      console.error(err);
+      resp.send("ERROR Loading PunkMoney Account", 500);
+    } else {
+      resp.render('add_punk_money_finish', {
+          title: 'PunkMoney Account Confirmed',
+          user: user});
+    }
+  });
+};
+
 exports.existing_payment = function (req, resp) {
   if (browserid.enforceLogIn(req, resp)) return;
   existing_pay_methods(req.user, function (err, pay_meths){
@@ -132,9 +181,10 @@ exports.add_payment_method = function(req, res){
 };
 
 exports.stripe_add_payment = function (req, resp) {
-    // TODO: push email into API? It is implicit, but we don't
-    // want to run a second copy of BrowserID
-    var email = 'eozten@yahoo.com';
+    
+    console.log('============== wallet route stripe_add_payment');
+    util.puts(req.user);
+    var email = req.user;
     var paymentType = req.body['payment-type'];
     var expires = util.format('%s/%s', req.body['visa-expiration-month'],
                                        req.body['visa-expiration-year'].slice(-2));
@@ -150,80 +200,58 @@ exports.stripe_add_payment = function (req, resp) {
              console.log(err, customer);
              console.log("Couldn't create the customer record", err);
              return resp.send(err, 500);
+          } else {
+            var key = util.format("stripe-customerid-%s", email),
+                pay_meth_key;
+            console.log('customer==');
+            util.puts(customer);
+            // mysql and redis TODO pick a horse
+            db.withDb(function (err, conn, _db) {
+              userdb.create_stripe_customer(conn, email, customer.id);
+            });
+
+            redis.set(key, customer.id);
+
+            // List of all stripe customer ids
+            redis.rpush('stripe-customers', customer.id);
+
+            pay_meth_key = util.format("pay-methods-%s-%s", email, paymentType);
+            redis.hmset(pay_meth_key, {
+              type: paymentType,
+              cc: req.body['visa-cc'],
+              expires: expires
+            });
+
+            // List of all payment methods by email
+            key = util.format("pay-methods-%s", email);
+            redis.rpush(key, pay_meth_key);
+
+            console.log("customer id", customer.id);
+            resp.redirect('/pay');  
           }
-          var key = util.format("stripe-customerid-%s", email),
-              pay_meth_key;
-
-          // mysql and redis TODO pick a horse
-          db.withDb(function (err, conn, _db) {
-            userdb.create_stripe_customer(conn, email, customer.id);
-          });
-
-          redis.set(key, customer.id);
-
-          // List of all stripe customer ids
-          redis.rpush('stripe-customers', customer.id);
-
-          pay_meth_key = util.format("pay-methods-%s-%s", email, paymentType);
-          redis.hmset(pay_meth_key, {
-            type: paymentType,
-            cc: req.body['visa-cc'],
-            expires: expires
-          });
-
-          // List of all payment methods by email
-          key = util.format("pay-methods-%s", email);
-          redis.rpush(key, pay_meth_key);
-
-          console.log("customer id", customer.id);
-          resp.redirect('/pay');
+          
        });
 };
 
 exports.pay_transaction = function (req, resp) {
   if (browserid.enforceLogIn(req, resp)) return;
-  db.withDb(function (err, conn, _db) {
-    userdb.get_user(conn, req.user, function (err, user) {
-    if (! user.customer_id) throw "Error, no stripe customer info";
-
-    var paydata = {
-      amount: req.body.amount,
-      currency: 'usd',
-      customer: user.customer_id,
-      description: req.body.description
-    };
-  console.log(req.body.payment_type);
-  if (req.body.payment_type.toUpperCase() != 'VISA_1') {
+  console.log('========== pay_transaction');
+  util.puts(req.body.payment_type);
+  if (req.body.payment_type.toUpperCase().indexOf('VISA') !== -1) {
+    mod = stripe_pay;
+  } else if (req.body.payment_type.toUpperCase().indexOf('PUNKMONEY') !== -1) {
+    mod = punkmoney;
+  } else {
+    console.log(details.payment_type);
     throw "TODO: right now this is stripe active card only";
   }
-  console.log(req.user);
-  console.log(req.body.amount);
-
-  console.log(req.body.description);
-  // Payee - Currently shout@ozten.com  stripe account...
-/* TODO merchant email -> stripe account */
-  stripe.charges.create(paydata,
-      function (err, charge) {
-        if (err) {
-          console.error(err);
-          resp.send(err, 500);
-        } else {
-          var pay_info = util.format("%s %d", charge.card.type, charge.card.last4);
-          console.log('charge info', charge);
-          var data = {
-            date: new Date(charge.created),
-            amount: charge.amount,
-            description: charge.description,
-            currency: charge.currency,
-            payment_type: pay_info,
-            merchant_email: 'shout@ozten.com', /* TODO */
-            transaction: charge.id
-          };
-          resp.send(JSON.stringify(data), {'Content-Type': 'application/json'});
-        }
-    });//charges.create
-
-    });//get_user
-  });//withDb
+  mod.pay_transaction(req.user, req.body, function (err, reciept) {
+      if (err) {
+        console.error(err);
+        resp.send(err, 500);
+      } else {
+        resp.send(JSON.stringify(reciept), {'Content-Type': 'application/json'});
+      }
+    });
 
 };

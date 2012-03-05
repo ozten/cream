@@ -4,6 +4,8 @@ $('#make-payment').live('submit', function(event) {
   // amount 1000 is $10.00
   var amount = parseInt($('#amount-dollar', $(this)).val(), 10) * 100 +
                parseInt($('#amount-cents', $(this)).val(), 10);
+  var initialPayer = $('#payer').val();
+  var merchant = $('#merchant_email').val();
   var process_reciept = function (reciept) {
     console.log(reciept);
     var f = $('#make-reciept');
@@ -16,13 +18,13 @@ $('#make-payment').live('submit', function(event) {
     console.log('submitting');
     f.submit();
   };
-  navigator.payz(amount, ['VISA', 'IOU'],
+  navigator.payz(amount, ['VISA', 'IOU', 'PunkMoney'],
                  // Which side has recipient
                  {
-                   reciever: 'shout@ozten.com',
+                   reciever: merchant,
                    //TODO How do we know what business this is?
                    // TODO how do we route their pahyment?
-                   payee: 'eozten@yahoo.com',
+                   payee: initialPayer,
                    description: 'Buy used couch',
                    success: process_reciept,
                    failure: function (error) { console.error(error); }

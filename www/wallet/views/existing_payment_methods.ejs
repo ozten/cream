@@ -9,6 +9,8 @@
       <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>" class="pay-type-<%= pay_meth.type.toLowerCase() %>">I Owe You</label></li>
     <% } else if (pay_meth.type.toUpperCase() == 'VISA') { %>
       <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type  %>_1" /> <label for="payment<%= i %>" class="pay-type-<%= pay_meth.type.toLowerCase() %>"><%= pay_meth.display  %></label></li>
+    <% } else if (pay_meth.type == 'PunkMoney') { %>
+      <li><input type="radio" id="payment<%= i %>" name="payment" value="<%= pay_meth.type %>_<%= i %>" /> <label for="payment<%= i %>" class="pay-type-<%= pay_meth.type.toLowerCase() %>">@<%= pay_meth.punk.screen_name  %></label></li>
     <% } else { %>
       <pre><code><%- util.inspect(pay_meth) %></code></pre>
     <% } %>

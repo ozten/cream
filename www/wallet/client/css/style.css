@@ -37,6 +37,10 @@ header nav ul li {
 #content label.pay-type-iou {
   background: url(/images/iou_42x30.png) no-repeat;
 }
+#content li.pay-type-punkmoney,
+#content label.pay-type-punkmoney {
+  background: url(/images/punkmoney_42x30.png) no-repeat;
+}
 #content #accept {
   float: left;
   width: 35%;

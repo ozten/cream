@@ -4,13 +4,9 @@
 $(document).ready(function () {
 
 var site = 'IP_ADDRESS';
-console.log('definging payz');
-console.log(window.WinChan);
 // TODO include winchan, package with almond.js?
 // Right now get the money includes winchan
 if ( ! navigator.payz ) {
-console.log('going for it');
-
   navigator.payz = function (amount, accepted_types, options) {
     var defaults = {
       success: function (recipet) {},
@@ -18,6 +14,7 @@ console.log('going for it');
       description: ""
     };
     var opt = $.extend(true, {}, defaults, options);
+    console.log('opt=', opt, 'options', options);
     if (window.WinChan)
     window.WinChan.open({
       url: site + "/pay",

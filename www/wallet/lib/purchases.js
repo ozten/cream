@@ -1,14 +1,4 @@
-exports.create_stripe_customer = function (conn, email, customer_id, cb) {
-  var ins_customer = "INSERT INTO stripe_customers (user_id, customer_id) " +
-                     "VALUES ((SELECT id FROM users WHERE email = ?), ?)";
-  conn.query(ins_customer, [email, customer_id], function (err, rows) {
-    if (cb) {
-        cb(err, rows);
-    } else if (err) {
-      console.log('create_stripe_customer error', err);
-    }
-  });
-};
+
 
 exports.create_purchase = function (conn, email, volume_number, cb) {
   var ins_vol = "INSERT INTO purchased_volumes (user_id, volume_id) " +

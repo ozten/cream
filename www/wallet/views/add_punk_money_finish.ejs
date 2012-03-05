@@ -1,0 +1,12 @@
+<p>Your account is setup</p>
+<% with (user) { %>
+
+  <h3>Account Enabled</h3>
+  
+  <div id="<%= id_str %>" style="background-color: #<%= profile_background_color %>; color: #<%= profile_text_color %>;">
+  	<img src="<%= profile_image_url %>">
+    <p><strong>@<%= screen_name %></strong> can send PunkMoney payments.</p>
+  </div>
+  <p>YOu may return to your wallet to pay</p>
+  <!-- TODO do window mesaging -->
+<% } %>

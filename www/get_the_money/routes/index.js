@@ -146,7 +146,6 @@ exports.pay = function(req, res){
 };
 
 exports.create_reciept = function (req, resp) {
-  //req.user = 'eozten@yahoo.com';
   if (browserid.enforceLogIn(req, resp)) return;
   var tx_id = req.body.transaction_id,
       reciept = {
@@ -169,7 +168,6 @@ exports.create_reciept = function (req, resp) {
 };
 
 exports.reciept = function (req, resp) {
-  //req.user = 'eozten@yahoo.com';
   if (browserid.enforceLogIn(req, resp)) return;
   payments.reciept(req.params.transaction_id, function (err, reciept) {
     if (err)

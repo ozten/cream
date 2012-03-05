@@ -23,14 +23,17 @@ $(document).ready(function () {
       user_email = args.payee; // TODO state.user_email?
       add_pay_meth_chooser = function () {
         var pt = $('[name=payment]:checked').val();
+        console.log('posting with pt=', pt);
+        console.log('args=', args);
+        
         $.ajax('/pay-transaction', {
           type: 'POST',
           dataType: 'json',
           data: {
             amount: args.amount,
             description: args.description,
-            payment_type: pt
-            /* TODO merchant email */            
+            payment_type: pt,
+            merchant_email: args.payer
           },
           error: function (data, status, jqXhr) {
             // TODO
@@ -82,6 +85,8 @@ $(document).ready(function () {
 
           if (window.payMethod == 'VISA') {
             doStripe();
+          } else {
+            alert('Unknown payment type: ' + window.payMethod);
           }
         });
       });

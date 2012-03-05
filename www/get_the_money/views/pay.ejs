@@ -18,7 +18,9 @@
   <input type="hidden" name="actual_amount" value="" />
   <input type="hidden" name="currency" value="" />
   <input type="hidden" name="date" value="" />
-  <input type="hidden" name="merchant_email" value="" />
+  <% /* Payer may change, if they unlock their wallet and swithc identities (?) */ %>
+  <input id="payer" type="hidden" name="payer" value="<%= user %>" />
+  <input id="merchant_email" type="hidden" name="merchant_email" value="<%= requestorEmail %>" />
   <input type="hidden" name="payment_type" value="" />
   <input type="hidden" name="transaction_id" value="" />
 </form>

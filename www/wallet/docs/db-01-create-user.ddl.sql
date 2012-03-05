@@ -1,11 +1,12 @@
 DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-  id INTEGER NOT NULL AUTO_INCREMENT,
-  email VARCHAR(256) NOT NULL UNIQUE,
-  PRIMARY KEY(id),
-  created TIMESTAMP default CURRENT_TIMESTAMP,
-  INDEX(email, id)
-);
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(256) CHARACTER SET latin1 NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `email_2` (`email`,`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS purchased_volumes;
 CREATE TABLE purchased_volumes (
@@ -23,3 +24,12 @@ CREATE TABLE stripe_customers (
   FOREIGN KEY (user_id) REFERENCES users(id),
   UNIQUE(user_id, customer_id)
 );
+
+DROP TABLE IF EXISTS punkmoney_oauth;
+CREATE TABLE `punkmoney_oauth` (
+  `email` varchar(255) NOT NULL,
+  `twitter_access_token` varchar(255) NOT NULL DEFAULT '',
+  `twitter_access_token_secret` varchar(255) NOT NULL DEFAULT '',
+  UNIQUE KEY `twitter_access_token` (`twitter_access_token`,`twitter_access_token_secret`),
+  KEY `email` (`email`,`twitter_access_token`,`twitter_access_token_secret`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
