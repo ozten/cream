@@ -56,6 +56,7 @@ app.get('/', routes.index);
 
 app.get('/pay', routes.pay);
 app.get('/existing-payment', routes.existing_payment);
+app.get('/existing-payment-details/:method', routes.existing_payment_details);
 
 app.post('/auth', browserid.auth());
 browserid.events.on('login', function (verified_email, req, resp) {

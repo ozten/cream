@@ -3,30 +3,63 @@ var util = require('util');
 var db = require('./db'),
     OAuth = require('oauth').OAuth;
 
+var withAccess = function (email, cb) {
+  db.withDb(function(err, conn) {
+    var sel = "SELECT twitter_access_token, twitter_access_token_secret FROM " +
+    " punkmoney_oauth WHERE email = ?";
+    conn.query(sel, [email], function (err, rows) {
+      if (err) {
+          cb(err, null);
+      } else if (0 === rows.length) {
+        cb("No Twitter User for " + email, null);
+      } else {
+        var oauth_access_token = rows[0]['twitter_access_token'],
+            oauth_access_token_secret = rows[0]['twitter_access_token_secret'],
+            oauth = _oauth();
+
+        cb(err, oauth_access_token, oauth_access_token_secret);
+        
+        } // if else if else
+     }); // conn.query(sel)
+    }); //db.withDb
+};
 
 exports.get_account = function (email, cb) {
-  db.withDb(function(err, conn) {
-  	var sel = "SELECT twitter_access_token, twitter_access_token_secret FROM " +
-  	" punkmoney_oauth WHERE email = ?";
-    conn.query(sel, [email], function (err, rows) {
-    	if (err) {
-      	  cb(err, null);
-    	} else if (0 === rows.length) {
-    	  cb("No Twitter User for " + email, null);
-    	} else {
-	    	var oauth_access_token = rows[0]['twitter_access_token'],
-		  	    oauth_access_token_secret = rows[0]['twitter_access_token_secret'],
-		  	    oauth = _oauth();
+  withAccess(email, function (err, oauth_access_token, oauth_access_token_secret) {
+    if (err) {
+      cb(err, null, null);
+    } else {
+      var oauth = _oauth();
+      oauth.getProtectedResource("https://api.twitter.com/account/verify_credentials.json", "GET", 
+        oauth_access_token, 
+          oauth_access_token_secret, function (err, data, response) {              
+            cb(err, JSON.parse(data));                 
+      });  //verify_credentials
+    }
+  });
+}; // get_account
 
-		    oauth.getProtectedResource("https://api.twitter.com/account/verify_credentials.json", "GET", 
-		    	oauth_access_token, 
-		      	oauth_access_token_secret, function (err, data, response) {	      		   
-		      		cb(err, JSON.parse(data));		      		   
-		     });	
-    	  }
-	   });
-    });	
-};
+exports.promise = function (email, tweet, cb) {
+  var params = {
+      status: tweet
+  };
+  withAccess(email, function (err, oauth_access_token, oauth_access_token_secret) {
+    if (err) {
+      cb(err, null, null);
+    } else {
+      var oauth = _oauth();
+      oauth.post("https://api.twitter.com/statuses/update.json", 
+        oauth_access_token, 
+        oauth_access_token_secret, 
+        params,
+        function (err, data, response) {              
+            console.log(data);
+            // Send back a JSON object
+            cb(err, JSON.parse(data));
+      });  //verify_credentials
+    }
+  });
+}; // get_account
 
 /**
  * Requests an Access Token from Twitter
@@ -95,7 +128,24 @@ exports.save_token = function (email, session, resp) {
 };//save_token
 
 exports.pay_transaction = function (email, details, cb) {
+  var reciept = null;
+
+  console.log('punkmoney==================');
   console.log(details);
+  var merchant_twitter_username = 'ozten',
+      end = "#punkmoney"
+  
+  if (details.transferable === "false") {
+    end = "NT #punkmoney";
+  }
+  var tweet = util.format("@%s I promise %s %s", 
+                merchant_twitter_username, 
+                details.promise, 
+                end);
+  console.log(tweet);
+  exports.promise(email, tweet, function (err, reciept) {
+      cb(err, reciept);
+  });
 };
 
 function _oauth() {

@@ -109,6 +109,17 @@ var existing_pay_methods = function (email, cb) {
       }
     });
   });//withDb
+}; // existing_payment
+
+exports.existing_payment_details = function (req, resp) {
+  var payment_type = req.params.method.toLowerCase(),
+      ctx = {};
+  ctx.payment_type = payment_type;
+  // TODO
+  ctx.merchant_twitter_username = '@ozten';
+  console.log('payment_type', payment_type);
+  
+  resp.partial('existing_payment_details_' + payment_type, ctx);
 };
 
 /**

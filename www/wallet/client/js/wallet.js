@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    var add_pay_meth_chooser;
+    var pay_meth_chooser;
     var user_email;
     var state = { args: {} };
     WinChan.onOpen(function(origin, args, cb) {
@@ -21,20 +21,34 @@ $(document).ready(function () {
       populatePay(args);
 
       user_email = args.payee; // TODO state.user_email?
-      add_pay_meth_chooser = function () {
+      pay_meth_chooser = function () {
         var pt = $('[name=payment]:checked').val();
         console.log('posting with pt=', pt);
         console.log('args=', args);
-        
-        $.ajax('/pay-transaction', {
-          type: 'POST',
-          dataType: 'json',
-          data: {
+
+        if (pt.toUpperCase().indexOf('VISA') !== -1) {
+          var data = {
             amount: args.amount,
             description: args.description,
             payment_type: pt,
-            merchant_email: args.payer
-          },
+            merchant_email: args.payee
+          };
+          doPayTransaction(pt, data, cb);  
+        } else if (pt.indexOf('PunkMoney') !== -1) {
+          showPunkMoneyPay(pt, args, cb);
+        }
+      };
+    }); // WinChan.open
+
+    $('#pay').live('click', function () {
+      pay_meth_chooser();
+    });
+
+  var doPayTransaction = function (paymentType, data, cb) {
+    $.ajax('/pay-transaction', {
+          type: 'POST',
+          dataType: 'json',
+          data: data,
           error: function (data, status, jqXhr) {
             // TODO
             alert(data.error);
@@ -43,12 +57,44 @@ $(document).ready(function () {
             cb(data);
           }
         });
-      };
-    }); // WinChan.open
+  }; // doPayTransaction
 
-    $('#pay').live('click', function () {
-      add_pay_meth_chooser();
+
+  var showPunkMoneyPay = function (paymentType, args, cb) {
+    $('#existing-payment-details').load('/existing-payment-details/punkmoney', function () {
+      $('#existing-payment-details').show();
+      $('#existing-payment').hide();
+      $('#pay').parent().hide();
+      $('#pay-punkmoney').click(function (e) {
+        e.preventDefault();
+        
+        var data = {
+            amount: args.amount,
+            description: args.description,
+            payment_type: paymentType,
+            merchant_email: args.payee
+          };
+        data.promise = $('#punkmoney-tweet').val();
+        data.transferable = $('[name=transferable]:checked').val();
+        console.log('doctoring up args', data);
+        doPayTransaction(paymentType, data, cb);
+        return false;
+      });
+      $('#existing-payment-details .cancel').click(function (e) {
+        e.preventDefault();
+        cancelPunkMoneyPay();
+        return false;
+      });
     });
+    
+  };
+  var cancelPunkMoneyPay = function () {
+    $('#existing-payment-details').hide();
+    $('#existing-payment').show();
+    $('#pay').parent().show();
+  };
+
+/************************ Add Payment Method ****************************/
 
     $('[data-role=button]').live('click',  function (event) {
       event.preventDefault();
@@ -127,6 +173,8 @@ $(document).ready(function () {
       $('button.browserid').attr('disabled', null);
     }, opts);
   });
+
+/***************** Add payment methods **********************/
 
   var populatePay = function (args) {
       console.log('populatePay args=', args);
