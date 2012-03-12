@@ -1,0 +1,87 @@
+
+@import 'boilerplate';
+
+// Rounded Corners
+
+html {
+  min-width: auto;
+}
+
+// Left-to-Right Gradient
+.linearH(@start, @start_color, @first_stop, @end_color, @last_stop){
+  //background: (@start_color + @end_color) / 2; // Non CSS3 browsers get the average color
+  background-image: -moz-linear-gradient(@start,  @start_color @first_stop, @end_color @last_stop); // FF 3.6
+  background-image: -webkit-gradient(linear, @start center, right center, from(@start_color), to(@end_color)); // Safari 4+, Chrome
+  //background-image: -webkit-linear-gradient(@start center, right center, from(@start_color), to(@end_color)); // Chrome 10+, Safari 5.1+
+  background-image: -webkit-linear-gradient(@start center, right center, from(@start_color), to(@end_color)); // Chrome 10+, Safari 5.1+
+  background-image: -o-linear-gradient(@start, @start_color, @first_stop, @end_color, @last_stop); // Opera 11.10+
+  background-image: linear-gradient(@start, @start_color, @end_color); // CSS3
+  filter: %("progid:DXImageTransform.Microsoft.gradient(startColorstr=%d, endColorstr=%d, GradientType=1)", @start_color, @end_color); // IE6 & 7
+  -ms-filter: %("progid:DXImageTransform.Microsoft.gradient(startColorstr=%d, endColorstr=%d, GradientType=1)", @start_color, @end_color); // IE8
+  background-image: -ms-linear-gradient(@start, @start_color, @end_color); // IE10
+}
+
+
+body {
+  background-color: rgb(103, 131, 93);
+  .linearH(0, transparent, 5%, rgba(226,240,207,1.0), 5%);
+  background-size: 10px;
+
+}
+
+#content {
+    margin-top: 20px;
+    width: 450px;
+    margin: 10px auto;
+    border: solid 1px rgb(103, 131, 93);
+    //background-color: rgba(255, 255, 255, 0.8);
+    .gradientV3(lighten(rgb(103, 131, 93), 20%), rgb(103, 131, 93), 50%, darken(rgb(103, 131, 93), 10%));
+    .borderRadius(15px);
+    padding: 20px;
+    .boxShadow(3px 3px 6px rgba(0, 0, 0, 0.8));
+}
+
+h1 {
+    //color: darken(rgb(103, 131, 93), 25%);
+    color: rgba(226,240,207,1.0);
+    font-size: 2em;
+    text-align: left;
+    margin-left: 10px;
+    font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(30, 30, 30, 0.8);
+    border-bottom: solid 5px lighten(rgb(103, 131, 93), 20%);
+}
+p {
+  margin-top: 20px;
+  margin-bottom: 80px;
+  color: #FFF;
+  font-family: Times;
+}
+p, ul {
+  margin-left: 10px;
+}
+
+li a {
+    .borderRadius(5px);
+    border: solid 1px black;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    font-size: 2em;
+    width: 400px;
+    display: block;
+
+    //background-color: lighten(rgba(226,240,207,1.0), 10%);
+    background-color: lighten(rgb(103, 131, 93), 50%);
+
+    text-decoration: none;
+    font-weight: bold;
+    color: #336;
+
+  .boxShadow(3px 3px 6px rgba(0, 0, 0, 0.5));
+
+  .tagline { font-size: 0.6em; }
+}
+
+li a:hover {
+    background-color: lighten(rgb(103, 131, 93), 80%);
+}
