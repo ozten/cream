@@ -1,0 +1,18 @@
+<img src="/images/punkmoneylogo.png" alt="PunkMoney Logo" width="200" />
+<p><a href="http://www.punkmoney.org/help/">#PunkMoney</a> is a promise currency. Anyone can create, transfer or redeem it on Twitter.</p>
+
+<form>
+<%= merchant_twitter_username %> I promise
+<textarea id="punkmoney-tweet"></textarea>
+
+<div>Transferrable? 
+<input id="transferable-yes" type="radio" name="transferable" value="true" CHECKED />
+<label for="transferable-yes">Yes</label>
+
+<input id="transferable-no" type="radio" name="transferable" value="false" />
+<label for="transferable-no">No</label>
+
+#PunkMoney
+
+<button id="pay-punkmoney">Pay</button> <button class="cancel">Cancel</button>
+</form>

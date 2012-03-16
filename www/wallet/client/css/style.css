@@ -106,6 +106,9 @@ header nav ul li {
 #content #add-payment #chooser ul li a {
   color: #000;
 }
+.twitter-avatar {
+  max-width: 300px;
+}
 footer {
   clear: both;
 }

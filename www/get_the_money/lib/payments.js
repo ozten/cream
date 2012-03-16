@@ -32,7 +32,7 @@ var munge = function (email, data) {
         throw "Data mis-match see logs";
       }
     } else {
-      throw "Unknown try of recent activity";
+      console.log("Unknown type of recent activity", data[i]);
     }
   }
   return d;
@@ -43,7 +43,7 @@ exports.recent = function (email, cb) {
   Step(
     function () {
       client.llen('account-' + email, this);
-    }, 
+    },
     function (err, len) {
       redis.print(err, len);
       if (len == 0) cb(munge(email, []));
@@ -65,7 +65,7 @@ exports.recent = function (email, cb) {
                 console.log('counter=', counter);
                 if (counter === 0) {
                   console.log('carry on');
-                  console.log('ALL DONE', res); 
+                  console.log('ALL DONE', res);
                   cb(munge(email, res));
                 }
               }
@@ -79,7 +79,7 @@ exports.recent = function (email, cb) {
 
 /*
 
-Payment - 
+Payment -
 Jane paid Bob $50 for 'dinner' paid at 12/12 5:12pm
  \------ breaks down in Payments and Income
 
