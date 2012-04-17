@@ -25,36 +25,28 @@ Merchant websites should include
     <script src="https://wallet.persona.org/include.js"></script>
     <script>
     ...
-    navigator.id.pay(amounts, accepted_pay_types, customer_email, merchant_email,
-        callback(err, receipt) {
-          if (err) {
+    navigator.id.pay(theRequestObject, onBuySuccess, onBuyFailure);
 
-          } else {
-                verify_reciept_serverside(receipt);
-          }
-        },
-        options);
+An example ``theRequestObject`` with some psuedo code:
 
-TBD: We can use a parameter object instead of 6 parameters
+    {
+        audience: "phoshizzle.biz",
+        amount: 7.99,
+        currency: "USD",
+        description: "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
+        accepted_pay_types: ["VISA": "paypal.com"],
+        customer_email: "alice@example.com",
+        merchant_email: "billing@phosizzle.biz"
+    }
 
-### Required Parameters ###
-- ** amounts ** - A list of strings, each string is an integer amount followed by a space followed by a currency code.
+_** NOTE: **_ In buy spec, ``iss`` is the merchant's key. We use ``merchant_email`` for this purpose?
 
-    For currencies that allow fractions, this will a whole number representation. Standardization is per
-payment type, driven by that community.
+### Required Fields of Payment Request object ###
+- ** audience ** - The website requesting payment
+- ** amount ** - A float
+- ** currency ** - string, currency code
 
-    #### Example Amounts ####
-
-    * $10 USD would be formatted as '1000 USD'.
-    * E9.99 would be formatted as '999 EU'
-    * 213.495 Bitcoins would be '213495 BTC'
-    * 4 Dowallas (a integer only currency) would be '4 DW'
-
-    Multiple amounts are allowed, to alleviate the need for currency exchange rate calculation.
-
-        navigator.id.pay(['120 EU', '200 USD'], ['VISA', 'MASTERCARD'])
-
-    _TODO:_ Supporting multiple currencies makes this very complicated, pushing this into the RP is probably better?
+    Standardization is per payment type, driven by that community.
 
 - ** accepted_payment_types ** - A list of objects, each object has keys which are payment types codes and the values are payment processor domains. The domain is where the payment processor will accept payment.
 
@@ -82,6 +74,12 @@ payment type, driven by that community.
 
 - ** merchant_email ** - A verified email address from the merchant. The payment will be routed to the wallet associated with this address.
 
+### Optional fields ###
+
+- ** description ** - A 255 character or less string describing the purchase.
+
+### onBuySucess callback ###
+
 - ** callback ** - A function which takes two arguments, error and receipt. If there is a payment error during the transaction, reciept will be ``null`` and error will be one of the following codes:
 
     * USER_DENIED_TRANSACTION - User canceled initial dialog
@@ -101,10 +99,6 @@ payment type, driven by that community.
     * payment_processor
     * customer_email
     * merchant_email
-
-### Options ###
-
-- ** description ** - A 255 character or less string describing the purchase.
 
 ## The User's Wallet ##
 
@@ -126,12 +120,11 @@ If the user indicates they want to pay, then a Payment transaction is begun. A u
 UA SHOULD understand the relatinship between amount and applicable payment type. Example:
 navigator.id.pay called with:
 
-    var amounts = ['1000 USD', '853 EU', '51123 BTC'];
-    var accepted_pay_types = {"VISA": "Authorize.net", "BITCOIN": "bitcoinexchange.biz"}
+    amount: 10.00,
+    currency: 'USD',
+    accepted_pay_types: {"VISA": "Authorize.net", "BITCOIN": "bitcoinexchange.biz"}
 
-The UA SHOULD inform the user that they an either pay $10.00, 8.53 EU or 51.123 BTC. Once the user has selected a
-payment method and before the are able to start the transaction, the UA MUST show which amount will be paid
-with that chosen payment method.
+The UA SHOULD inform the user that they an either pay $10.00, 8.53 EU or 51.123 BTC. Once the user has selected a payment method and before the are able to start the transaction, the UA MUST show which amount will be paid with that chosen payment method.
 
 So if a user selected their Bitcoin purse, then only 511.23 BTC would be displayed.
 
@@ -166,14 +159,24 @@ Wallet sends startTransaction
 Wallet serializes and sends:
 
     {
-      "amount": "1253 USD",
-      "payment_type": "VISA",
-      "cc_number": "4242123412344242",
-      "expires": "04/12/2012",
-      "description": "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
-      "merchant_email": "billing@phoshizzle.biz",
-      "customer_email": "alice@example.com"
-    }
+        iss: "ABC",
+        aud: "phoshizzle.biz",
+        typ: "JWT",
+        exp: (now + an hour),
+        request:
+        {
+            amount: 12.53,
+            currency: "USD",
+            description: "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
+            "payment_type": "VISA",
+            "cc_number": "4242123412344242",
+            "expires": "04/12/2012",
+            customer_email: "alice@example.com",
+            merchant_email: "billing@phosizzle.biz",
+        }
+    } (signed-with-AppOperatorSecret-HMAC256)
+
+_TODO:_ I think we're missing ``iss`` and ``AppOperatorSecret``.
 
 The Payment Processor does the various steps which are appropriate for the Payment Type to gain enough
 confidence that they can capture a payment or a promise to pay based on the inputs.
@@ -192,8 +195,9 @@ to the Recognized Payment Type ``VISA``.
 ### Basic Payment Details ###
 All Payment Types will have the same basic Payment Details:
 
-- ** amount ** - see navigator.id.pay required parameter amounts
-- ** payment_type ** - a payment type code
+- ** amount **
+- ** currency **
+- ** payment_type **
 - ** description **
 - ** merchant_email **
 - ** customer_email **
@@ -214,8 +218,9 @@ A Payment Processor MUST make cvv optional, but MAY offer more favorable process
 - ** customer_account ** - String indicating the customer's bank account number
 
 #### Example ####
-    {
-      "amount": "1253 USD",
+    "request": {
+      "amount": 12.53,
+      "currency": "USD",
       "payment_type": "ACH",
       "bank_route": "01234559234343212343443"
       "description": "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
@@ -233,8 +238,10 @@ The PaymentProcessor sends the ``paymentCompleted`` message with a JWT formatted
 ### Reciept Format ##
 The decrypted form of the reciept includes the following information:
 
-    {
-      "amount": "1253 USD",
+    ...
+    "request": {
+      "amount": "12.53"
+      "currency": "USD",
       "payment_type": "VISA",
       "display_cc_number": "********4242",
       "expires": "04/12/2012",
@@ -294,17 +301,24 @@ Advertise a url in the ``verification_endpoint`` property of their ``/.well-know
 This web service with the following interface:
 
 Accept POST JWT receipt as message body
-    Return 200 {
-      "status": "okay",
-      "transaction_date": 123445345345,
-      "amount": "1253 USD",
-      "payment_type": "VISA",
-      "display_cc_number": "****4242",
-      "expires": "04/12/2012",
-      "description": "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
-      "merchant_email": "billing@phoshizzle.biz",
-      "customer_email": "alice@example.com"
-    }
+    {
+        "iss": "PaymentProcessorPublicKey",
+        "aud": "authorize.net",
+        "typ": "JWT",
+        "reciept":
+        {
+            "status": "okay",
+            "transaction_date": 123445345345,
+            "amount": "1253",
+            "currency": "USD",
+            "payment_type": "VISA",
+            "display_cc_number": "****4242",
+            "expires": "04/12/2012",
+            "description": "Pho Shizzle - Restaurant 5:32pm - Thanks, Come Again",
+            "merchant_email": "billing@phoshizzle.biz",
+            "customer_email": "alice@example.com"
+        }
+    } (signed-with-PaymentProcessorSecret-HMAC256)
 
 Having this service and returning plain text JSON makes adoption of payment processors much easier for
 merchant websites.

@@ -28,3 +28,6 @@ Persona Wallet in the Cloud - Synchronization servicce for Persona Wallets.
 1000 USD, 895 EU, ... Should we allow this?
 
 LIFD Wallet - credit card in localStorage may be a non-staters....
+
+## JWT ##
+I think we have a problem with public/private keys the merchant's JWT to the payment processor.
